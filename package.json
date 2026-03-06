@@ -1,0 +1,19 @@
+{
+  "name": "falak-hall-events",
+  "version": "1.0.0",
+  "description": "Professional website for Falak Hall & Events - Marriage Hall, GT Road Gujrat",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["marriage-hall", "events", "gujrat", "wedding-venue"],
+  "author": "Falak Hall & Events",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "mongodb": "^6.8.0"
+  }
+}
