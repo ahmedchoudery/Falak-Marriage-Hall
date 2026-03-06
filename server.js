@@ -16,27 +16,29 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB connection
-let db;
+let cachedDb = null;
 const MONGODB_URI = process.env.MONGODB_URI;
 
 async function connectDB() {
+    if (cachedDb) return cachedDb;
+
     try {
         const client = new MongoClient(MONGODB_URI);
         await client.connect();
-        db = client.db('falak_hall');
+        const db = client.db('falak_hall');
+        cachedDb = db;
         console.log('✅ Connected to MongoDB Atlas');
+        return db;
     } catch (error) {
         console.error('❌ MongoDB connection error:', error.message);
-        // Server will still run, bookings will fail gracefully
+        throw error;
     }
 }
 
 // API: Submit booking
 app.post('/api/booking', async (req, res) => {
     try {
-        if (!db) {
-            return res.status(503).json({ success: false, message: 'Database not available. Please try again later or contact us directly.' });
-        }
+        const db = await connectDB();
 
         const { name, phone, email, eventDate, eventType, hall, guests, message } = req.body;
 
@@ -76,8 +78,16 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start server
-app.listen(PORT, async () => {
-    console.log(`🏛️  Falak Hall & Events server running on http://localhost:${PORT}`);
-    await connectDB();
-});
+// Start server (only if running directly)
+if (process.env.NODE_ENV !== 'production' && require.main === module) {
+    app.listen(PORT, async () => {
+        console.log(`🏛️  Falak Hall & Events server running on http://localhost:${PORT}`);
+        try {
+            await connectDB();
+        } catch (err) {
+            console.error('Database connection failed on startup');
+        }
+    });
+}
+
+module.exports = app;
