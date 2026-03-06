@@ -42,6 +42,7 @@ header {
     top: 0;
     width: 100%;
     background: transparent;
+    background-color: #070B14;
     padding: 20px 0;
     z-index: 1000;
     transition: var(--transition);
