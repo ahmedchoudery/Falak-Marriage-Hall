@@ -4,15 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking & Reviews | Falak Hall & Events</title>
-    <!-- Google Fonts -->
+    <title>Online Booking | Falak Marriage Hall</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
         rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="favicon_new.png">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="favicon_new.png">
 </head>
 
 <body>
@@ -24,216 +22,84 @@
                     <i class="fas fa-bars"></i>
                 </div>
                 <ul class="nav-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="booking.html">Booking</a></li>
-                    <li><a href="contact.html">Location</a></li>
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="index.html#services">Services</a></li>
+                    <li><a href="index.html#gallery">Gallery</a></li>
+                    <li><a href="booking.html" class="active">Booking</a></li>
+                    <li><a href="contact.html">Contact</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <section style="margin-top: 80px;">
+    <section style="padding-top: 150px;">
         <div class="container">
-            <div class="section-title">
-                <h2>Book Your Event</h2>
+            <div class="section-title reveal">
+                <h2>Book Your Dream Event</h2>
                 <div class="underline"></div>
-                <p style="margin-top: 15px;">Secure your date today. Fill the form or reach us directly.</p>
+                <p style="margin-top: 15px;">Reserve your special date at Gujrat's most premium venue.</p>
             </div>
 
-            <div class="booking-container">
-                <!-- Form Side -->
-                <div class="booking-form-wrapper">
-                    <form id="bookingForm" class="menu-card" style="max-width: 100%; border-top-color: var(--primary);">
+            <div class="booking-container reveal">
+                <div class="booking-card" style="background: #fff; padding: 40px; border: 1px solid #eee;">
+                    <form id="bookingForm">
                         <div class="form-group">
-                            <label for="name">Full Name *</label>
-                            <input type="text" id="name" name="name" class="form-control" required
-                                placeholder="Enter your name">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" class="form-control" required
+                                placeholder="Enter your full name">
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div class="form-group">
-                                <label for="phone">Phone Number *</label>
-                                <input type="tel" id="phone" name="phone" class="form-control" required
-                                    placeholder="03xx xxx xxxx">
+                        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" class="form-control" required placeholder="03xx-xxxxxxx">
                             </div>
-                            <div class="form-group">
-                                <label for="email">Email Address</label>
-                                <input type="email" id="email" name="email" class="form-control"
-                                    placeholder="your@email.com">
-                            </div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div class="form-group">
-                                <label for="eventDate">Event Date *</label>
-                                <input type="date" id="eventDate" name="eventDate" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="eventType">Event Type *</label>
-                                <select id="eventType" name="eventType" class="form-control" required>
-                                    <option value="">Select Event Type</option>
-                                    <option value="Baraat">Baraat</option>
-                                    <option value="Walima">Walima</option>
-                                    <option value="Mehndi">Mehndi</option>
-                                    <option value="Engagement">Engagement</option>
-                                    <option value="Birthday">Birthday</option>
-                                    <option value="Corporate">Corporate Meeting</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div class="form-group">
-                                <label for="hall">Hall Preference</label>
-                                <select id="hall" name="hall" class="form-control">
-                                    <option value="Any">Any</option>
-                                    <option value="Ground Floor">Ground Floor</option>
-                                    <option value="First Floor">First Floor</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="guests">Estimated Guests</label>
-                                <input type="number" id="guests" name="guests" class="form-control"
-                                    placeholder="e.g. 500">
+                            <div>
+                                <label for="eventDate">Event Date</label>
+                                <input type="date" id="eventDate" class="form-control" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="message">Additional Requirements</label>
-                            <textarea id="message" name="message" class="form-control" rows="4"
-                                placeholder="Tell us about your preferences (Catering, Decor, etc.)"></textarea>
+                            <label for="guests">Estimated Guests</label>
+                            <input type="number" id="guests" class="form-control" placeholder="e.g. 500" required>
                         </div>
-                        <button type="submit" class="btn" style="width: 100%;">Submit Booking Request</button>
+                        <div class="form-group">
+                            <label for="message">Your Requirements</label>
+                            <textarea id="message" class="form-control" rows="5"
+                                placeholder="Tell us about your theme, catering needs, etc."></textarea>
+                        </div>
+                        <button type="submit" class="btn" style="width: 100%;">Submit Inquiry</button>
                     </form>
+                    <div id="formStatus" style="margin-top: 20px; text-align: center;"></div>
                 </div>
 
-                <!-- Info Side -->
-                <div class="contact-sidebar">
-                    <div class="menu-card"
-                        style="max-width: 100%; border-top-color: var(--secondary); background: var(--secondary); color: white;">
-                        <h3 style="color: var(--primary); text-align: left;">Direct Contact</h3>
-                        <p style="margin-bottom: 30px;">For urgent bookings or custom packages, please call or message
-                            us directly.</p>
-
-                        <div style="margin-bottom: 25px; display: flex; align-items: center; gap: 15px;">
-                            <div
-                                style="background: var(--primary); color: var(--secondary); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">
-                                <i class="fas fa-phone"></i>
-                            </div>
-                            <div>
-                                <h4 style="margin: 0;">Phone</h4>
-                                <p style="margin: 0;"><a href="tel:03086891083"
-                                        style="color: white; text-decoration: none;">0308-6891083</a></p>
-                            </div>
-                        </div>
-
-                        <div style="margin-bottom: 25px; display: flex; align-items: center; gap: 15px;">
-                            <div
-                                style="background: #25d366; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                                <i class="fab fa-whatsapp"></i>
-                            </div>
-                            <div>
-                                <h4 style="margin: 0;">WhatsApp</h4>
-                                <p style="margin: 0;"><a href="https://wa.me/923086891083"
-                                        style="color: white; text-decoration: none;">+92 308 6891083</a></p>
-                            </div>
-                        </div>
-
-                        <div style="margin-bottom: 25px; display: flex; align-items: center; gap: 15px;">
-                            <div
-                                style="background: var(--primary); color: var(--secondary); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div>
-                                <h4 style="margin: 0;">Email</h4>
-                                <p style="margin: 0;"><a href="mailto:ahmedchoudery30@gmail.com"
-                                        style="color: white; text-decoration: none;">ahmedchoudery30@gmail.com</a></p>
-                            </div>
-                        </div>
-
-                        <div
-                            style="margin-top: 40px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px;">
-                            <p style="font-size: 0.9rem; font-style: italic;">
-                                "We organize entire events from food to lighting. A single window solution for your
-                                happiness."
-                            </p>
+                <div class="reveal">
+                    <div style="background: var(--secondary); color: white; padding: 50px; height: 100%;">
+                        <h3 class="premium-font" style="font-size: 2.2rem; margin-bottom: 30px; color: var(--primary);">
+                            Premium Experience</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: 25px; display: flex; align-items: flex-start;">
+                                <i class="fas fa-gem"
+                                    style="color: var(--primary); margin-right: 15px; margin-top: 5px;"></i>
+                                <span><strong>Luxury Ambience:</strong> Grand halls with exquisite lighting and
+                                    decor.</span>
+                            </li>
+                            <li style="margin-bottom: 25px; display: flex; align-items: flex-start;">
+                                <i class="fas fa-utensils"
+                                    style="color: var(--primary); margin-right: 15px; margin-top: 5px;"></i>
+                                <span><strong>Custom Catering:</strong> Gourmet menus prepared by expert chefs.</span>
+                            </li>
+                            <li style="margin-bottom: 25px; display: flex; align-items: flex-start;">
+                                <i class="fas fa-camera"
+                                    style="color: var(--primary); margin-right: 15px; margin-top: 5px;"></i>
+                                <span><strong>Full Management:</strong> Photography, Stage, and Sound - all in one
+                                    place.</span>
+                            </li>
+                        </ul>
+                        <div style="margin-top: 40px; padding: 20px; border: 1px dashed rgba(255,255,255,0.2);">
+                            <p style="font-style: italic; opacity: 0.8;">"Submit your inquiry above, and our event
+                                experts will contact you within 24 hours to plan your perfect day."</p>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Reviews Section -->
-    <section id="reviews" style="background: #fdfdfd;">
-        <div class="container">
-            <div class="section-title">
-                <h2>Our Happy Guests</h2>
-                <div class="underline"></div>
-            </div>
-
-            <div class="reviews-grid">
-                <!-- Review 1 -->
-                <div class="review-card">
-                    <div class="stars">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                            class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p>"Excellent service! We booked Falak Hall for my brother's Walima. The food was delicious and the
-                        arrangement was perfect. Staff is very professional."</p>
-                    <h5 style="margin-top: 15px; color: var(--secondary);">Muhammad Ahmed</h5>
-                </div>
-
-                <!-- Review 2 -->
-                <div class="review-card">
-                    <div class="stars">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                            class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p>"One of the best marriage halls in Gujrat. The lighting and decoration they provided were
-                        stunning. Highly recommended for baraat events."</p>
-                    <h5 style="margin-top: 15px; color: var(--secondary);">Zeeshan Malik</h5>
-                </div>
-
-                <!-- Review 3 -->
-                <div class="review-card">
-                    <div class="stars">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                            class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p>"Everything was managed responsively as promised. The chicken biryani was exceptional. Thank you
-                        for making our event special."</p>
-                    <h5 style="margin-top: 15px; color: var(--secondary);">Fatima Sheikh</h5>
-                </div>
-
-                <!-- Review 4 -->
-                <div class="review-card">
-                    <div class="stars">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                            class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p>"Amazing ambience and very cooperative management. The venue is clean and well-maintained. We
-                        loved the stage decoration."</p>
-                    <h5 style="margin-top: 15px; color: var(--secondary);">Omar Farooq</h5>
-                </div>
-
-                <!-- Review 5 -->
-                <div class="review-card">
-                    <div class="stars">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                            class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p>"Professional photoshoot and lightings were top notch. It truly felt like a premium experience
-                        without any stress."</p>
-                    <h5 style="margin-top: 15px; color: var(--secondary);">Hassan Raza</h5>
-                </div>
-
-                <!-- Review 6 -->
-                <div class="review-card">
-                    <div class="stars">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                            class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p>"The best part is their one-window solution. We didn't have to worry about anything from seating
-                        to music. Great team!"</p>
-                    <h5 style="margin-top: 15px; color: var(--secondary);">Saira Banu</h5>
                 </div>
             </div>
         </div>
@@ -242,14 +108,10 @@
     <footer>
         <div class="container">
             <div class="footer-bottom">
-                <p>&copy; 2026 Falak Hall & Events. All Rights Reserved.</p>
+                <p>&copy; 2026 Falak Marriage Hall. All Rights Reserved.</p>
             </div>
         </div>
     </footer>
-
-    <a href="https://wa.me/923086891083" class="whatsapp-float" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
 
     <script src="js/main.js"></script>
 </body>

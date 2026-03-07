@@ -30,9 +30,73 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Intersection Observer for Reveal Animations
+    const observerOptions = {
+        threshold: 0.1
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // Testimonial Slider
+    const testimonials = document.querySelectorAll('.testimonial-card');
+    let currentTestimonial = 0;
+
+    if (testimonials.length > 0) {
+        function showTestimonial(index) {
+            testimonials.forEach(t => t.classList.remove('active'));
+            testimonials[index].classList.add('active');
+        }
+
+        setInterval(() => {
+            currentTestimonial = (currentTestimonial + 1) % testimonials.length;
+            showTestimonial(currentTestimonial);
+        }, 5000);
+
+        showTestimonial(0); // Show first initially
+    }
+
+    // Lightbox Functionality
+    window.openLightbox = (src) => {
+        const lightbox = document.createElement('div');
+        lightbox.id = 'lightbox';
+        lightbox.style.position = 'fixed';
+        lightbox.style.top = '0';
+        lightbox.style.left = '0';
+        lightbox.style.width = '100vw';
+        lightbox.style.height = '100vh';
+        lightbox.style.background = 'rgba(0,0,0,0.9)';
+        lightbox.style.display = 'flex';
+        lightbox.style.alignItems = 'center';
+        lightbox.style.justifyContent = 'center';
+        lightbox.style.zIndex = '2000';
+        lightbox.style.cursor = 'zoom-out';
+
+        const img = document.createElement('img');
+        img.src = src;
+        img.style.maxWidth = '90%';
+        img.style.maxHeight = '90%';
+        img.style.boxShadow = '0 0 50px rgba(0,0,0,0.5)';
+
+        lightbox.appendChild(img);
+        document.body.appendChild(lightbox);
+
+        lightbox.addEventListener('click', () => {
+            document.body.removeChild(lightbox);
+        });
+    };
+
     // Booking Form Submission
     const bookingForm = document.getElementById('bookingForm');
     if (bookingForm) {
+        // ... existing booking logic ...
         bookingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
