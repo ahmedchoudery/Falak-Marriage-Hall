@@ -1,15 +1,13 @@
 :root {
     --primary: #C6A769;
     /* Luxury Gold */
-    --primary-dark: #A58B56;
     --secondary: #0F2A24;
     /* Dark Green */
-    --bg-light: #F8F5F0;
-    /* Cream */
-    --bg-dark: #0A1C18;
-    --text-light: #F8F9FA;
+    --accent: #D4AF37;
+    /* Brighter Gold */
+    --bg-cream: #F8F5F0;
     --text-dark: #1A1A1A;
-    --glass: rgba(255, 255, 255, 0.1);
+    --white: #ffffff;
     --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -17,36 +15,181 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+body {
     font-family: 'Montserrat', sans-serif;
+    line-height: 1.8;
+    color: var(--text-dark);
+    background-color: var(--bg-cream);
+    overflow-x: hidden;
 }
 
 h1,
 h2,
 h3,
-h4,
 .premium-font {
     font-family: 'Playfair Display', serif;
     font-weight: 700;
+    line-height: 1.2;
 }
 
-body {
-    background-color: var(--bg-light);
-    color: var(--text-dark);
-    line-height: 1.7;
-    font-size: 1rem;
-    overflow-x: hidden;
+h1 {
+    font-size: 48px;
 }
 
-/* Base Animations */
+h2 {
+    font-size: 36px;
+}
+
+h3 {
+    font-size: 24px;
+}
+
+p {
+    font-size: 16px;
+}
+
+/* Preloader */
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.6s ease;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(198, 167, 105, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Scroll-triggered Animations (AOS replacement/supplement) */
 .reveal {
     opacity: 0;
     transform: translateY(30px);
-    transition: all 0.8s ease-out;
+    transition: var(--transition);
 }
 
 .reveal.active {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Hero Slider */
+.hero-slider {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.slide.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+.hero-content {
+    text-align: center;
+    color: var(--white);
+    max-width: 800px;
+    z-index: 10;
+}
+
+.hero-content h1 {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.hero-content p {
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+.slider-controls {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 40px;
+    transform: translateY(-50%);
+    z-index: 20;
+}
+
+.slider-controls span {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    backdrop-filter: blur(5px);
+}
+
+.slider-controls span:hover {
+    background: var(--primary);
+}
+
+.slider-dots {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 20;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.dot.active {
+    background: var(--primary);
+    transform: scale(1.2);
 }
 
 /* Header & Nav */
@@ -60,10 +203,11 @@ header {
     transition: var(--transition);
 }
 
+/* Header Scroll Class Adjustment */
 header.scrolled {
     background: var(--secondary);
-    padding: 15px 0;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 10px 0;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
 }
 
 .container {
@@ -185,32 +329,54 @@ nav {
     }
 }
 
+/* Buttons */
 .btn {
     display: inline-block;
     padding: 15px 40px;
-    background: var(--primary);
-    color: var(--secondary);
+    background-color: var(--primary);
+    color: var(--white);
     text-decoration: none;
     font-weight: 600;
-    font-size: 1rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    border-radius: 0;
+    border-radius: 50px;
     transition: var(--transition);
     border: 2px solid var(--primary);
     cursor: pointer;
-}
-
-.btn-outline {
-    background: transparent;
-    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 14px;
 }
 
 .btn:hover {
-    background: var(--secondary);
+    background-color: transparent;
     color: var(--primary);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(198, 167, 105, 0.3);
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline:hover {
+    background-color: var(--primary);
+    color: var(--white);
+}
+
+/* Decorative Dividers */
+.divider {
+    height: 100px;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: -50px 0;
+    position: relative;
+    z-index: 5;
+}
+
+.wave-divider {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23F8F5F0' fill-opacity='1' d='M0,160L48,176C96,192,192,224,288,224C384,224,480,192,576,165.3C672,139,768,117,864,128C960,139,1056,181,1152,197.3C1248,213,1344,203,1392,197.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
 }
 
 /* Sections */
