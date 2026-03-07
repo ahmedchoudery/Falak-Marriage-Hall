@@ -9,8 +9,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Mobile menu toggle (if needed)
-    // Add logic here if a hamburger menu is added to HTML
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('mobile-menu');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            menuToggle.querySelector('i').classList.toggle('fa-bars');
+            menuToggle.querySelector('i').classList.toggle('fa-times');
+        });
+
+        // Close menu when a link is clicked
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                menuToggle.querySelector('i').classList.add('fa-bars');
+                menuToggle.querySelector('i').classList.remove('fa-times');
+            });
+        });
+    }
 
     // Booking Form Submission
     const bookingForm = document.getElementById('bookingForm');
