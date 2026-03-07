@@ -14,32 +14,32 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Great Vibes', cursive;
+    font-family: 'Montserrat', sans-serif;
 }
 
 h1,
 h2,
 h3,
+h4,
 .premium-font {
-    font-family: 'Great Vibes', cursive;
+    font-family: 'Playfair Display', serif;
 }
 
 body {
     background-color: var(--bg-light);
     color: var(--text-dark);
-    line-height: 1.4;
-    font-size: 1.25rem;
+    line-height: 1.6;
+    font-size: 1rem;
     overflow-x: hidden;
 }
 
-/* Maintain readability for functional elements */
+/* Maintain consistency for functional elements */
 .nav-links a,
 .btn,
 .form-control,
-.price-tag small,
+.price-tag,
 footer p {
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
 }
 
 body.dark-mode {
