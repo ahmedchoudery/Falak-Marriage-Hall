@@ -14,21 +14,32 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Great Vibes', cursive;
 }
 
 h1,
 h2,
 h3,
 .premium-font {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Great Vibes', cursive;
 }
 
 body {
     background-color: var(--bg-light);
     color: var(--text-dark);
-    line-height: 1.6;
+    line-height: 1.4;
+    font-size: 1.25rem;
     overflow-x: hidden;
+}
+
+/* Maintain readability for functional elements */
+.nav-links a,
+.btn,
+.form-control,
+.price-tag small,
+footer p {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
 }
 
 body.dark-mode {
@@ -108,13 +119,14 @@ nav {
 }
 
 .hero-content h1 {
-    font-size: 4rem;
+    font-size: 6rem;
     margin-bottom: 20px;
     color: var(--primary);
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .hero-content p {
-    font-size: 1.2rem;
+    font-size: 2rem;
     max-width: 800px;
     margin: 0 auto 30px;
 }
@@ -147,7 +159,7 @@ section {
 }
 
 .section-title h2 {
-    font-size: 2.5rem;
+    font-size: 4rem;
     color: var(--secondary);
     margin-bottom: 10px;
 }
@@ -305,21 +317,6 @@ footer {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .nav-links {
-        display: none;
-    }
-
-    .hero-content h1 {
-        font-size: 2.5rem;
-    }
-
-    .booking-container {
-        grid-template-columns: 1fr;
-    }
-}
-
 /* Add-ons Section */
 .addons-grid {
     display: grid;
@@ -386,4 +383,63 @@ footer {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     text-decoration: none;
+}
+
+/* ==========================================
+   Responsive Updates (Mobile & Laptop)
+   ========================================== */
+@media (max-width: 1200px) {
+    .container {
+        padding: 0 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+
+    .hero-content h1 {
+        font-size: 3.5rem !important;
+    }
+
+    .hero-content p {
+        font-size: 1.5rem !important;
+    }
+
+    .section-title h2 {
+        font-size: 3rem !important;
+    }
+
+    .booking-container,
+    .contact-wrapper,
+    .halls-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hall-card {
+        height: 300px;
+    }
+
+    section {
+        padding: 60px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-content h1 {
+        font-size: 2.8rem !important;
+    }
+
+    .price-tag {
+        font-size: 1.6rem !important;
+    }
+
+    .menu-card {
+        padding: 25px 15px;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
 }
