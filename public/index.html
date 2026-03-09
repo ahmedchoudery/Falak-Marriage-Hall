@@ -4,9 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Falak Marriage Hall – Best Wedding Venue in Gujrat</title>
     <meta name="description"
-        content="Falak Marriage Hall is a premium wedding venue in Gujrat offering elegant halls, beautiful decoration, and unforgettable wedding experiences.">
+        content="Falak Marriage Hall - The most elegant and luxury wedding venue in Gujrat. Offering premium catering, professional decoration, and a royal ambience.">
+    <title>Falak Marriage Hall | Luxury Wedding Venue Gujrat</title>
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WeddingVenue",
+      "name": "Falak Marriage Hall",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "GT Road, Service Mor",
+        "addressLocality": "Gujrat",
+        "addressRegion": "Punjab",
+        "postalCode": "50700",
+        "addressCountry": "PK"
+      },
+      "telephone": "+923086891083",
+      "url": "https://falak-marriage-hall.vercel.app/",
+      "image": "https://falak-marriage-hall.vercel.app/images/hero_bg.png",
+      "priceRange": "$$$",
+      "openingHours": "Mo-Su 09:00-23:00"
+    }
+    </script>
 
     <!-- OpenGraph Tags -->
     <meta property="og:title" content="Falak Marriage Hall | Luxury Wedding Venue">
@@ -24,11 +46,27 @@
 </head>
 
 <body>
+    <!-- Scroll Progress Bar -->
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
     <!-- Page Loader -->
     <div id="preloader">
         <div class="loader"></div>
     </div>
 
+    <!-- Sticky CTA Bar -->
+    <div class="sticky-cta" id="sticky-cta">
+        <a href="tel:+923086891083" class="cta-btn">
+            <i class="fas fa-phone"></i> Call Now
+        </a>
+        <a href="https://wa.me/923086891083" class="cta-btn">
+            <i class="fab fa-whatsapp"></i> WhatsApp Booking
+        </a>
+    </div>
+
+    <!-- Floating WhatsApp -->
     <header id="header">
         <div class="container">
             <nav>
@@ -36,14 +74,17 @@
                 <div class="menu-toggle" id="mobile-menu">
                     <i class="fas fa-bars"></i>
                 </div>
-                <ul class="nav-links">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#gallery">Gallery</a></li>
-                    <li><a href="booking.html" class="premium-link">Online Booking</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
+                <div class="nav-links">
+                    <a href="#home">Home</a>
+                    <a href="#about">About</a>
+                    <a href="#services">Services</a>
+                    <a href="#gallery">Gallery</a>
+                    <a href="booking.html" class="active">Booking</a>
+                    <a href="#location">Location</a>
+                    <div class="theme-toggle" id="theme-toggle">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                </div>
             </nav>
         </div>
     </header>
@@ -90,6 +131,19 @@
     </section>
 
     <div class="divider wave-divider"></div>
+
+    <!-- Parallax Section -->
+    <section class="parallax-section" style="background-image: url('images/gallery_1.png');">
+        <div class="parallax-overlay"></div>
+        <div class="container" style="position: relative; z-index: 2;">
+            <div class="heading-wrapper reveal">
+                <span class="section-subtitle">Celebrate</span>
+                <h2 style="color: white; margin: 0;">Celebrate Your Special Day at Falak</h2>
+                <div class="underline"></div>
+            </div>
+            <p class="reveal">Experience royal hospitality and breathtaking decorations tailored to your vision.</p>
+        </div>
+    </section>
 
     <!-- About Section Redesign -->
     <section id="about" style="padding: 100px 0;">
@@ -201,6 +255,30 @@
                 </div>
             </div>
         </div>
+        <!-- Before/After Slider -->
+        <section style="padding: 100px 0; background: var(--bg-cream);">
+            <div class="container">
+                <div class="heading-wrapper reveal">
+                    <span class="section-subtitle">Transformation</span>
+                    <h2>Magic of Decoration</h2>
+                    <div class="underline"></div>
+                    <p>See how we transform our elegant hall into a royal masterpiece.</p>
+                </div>
+                <div class="comparison-container reveal">
+                    <div class="comparison-img before-img" style="background-image: url('images/2.jpeg');"></div>
+                    <div class="comparison-img after-img" id="after-img"
+                        style="background-image: url('images/gallery_4.png'); width: 50%;"></div>
+                    <div class="slider-handle" id="slider-handle"></div>
+                    <div
+                        style="position: absolute; bottom: 20px; left: 20px; z-index: 5; color: white; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px;">
+                        Before</div>
+                    <div
+                        style="position: absolute; bottom: 20px; right: 20px; z-index: 5; color: white; background: var(--primary); padding: 5px 15px; border-radius: 20px;">
+                        After</div>
+                </div>
+            </div>
+        </section>
+
         <!-- Wedding Packages -->
         <section id="packages" style="padding: 100px 0;">
             <div class="container">
@@ -306,6 +384,43 @@
             </div>
         </section>
 
+        <!-- Wedding Planning Tips -->
+        <section id="tips" style="padding: 100px 0; background: var(--white);">
+            <div class="container">
+                <div class="heading-wrapper reveal">
+                    <span class="section-subtitle">Expert Advice</span>
+                    <h2>Wedding Planning Tips</h2>
+                    <div class="underline"></div>
+                </div>
+                <div class="services-grid">
+                    <div class="service-card reveal ripple">
+                        <i class="fas fa-map-marker-alt"
+                            style="font-size: 2rem; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h3 class="premium-font">Choosing Venue</h3>
+                        <p>Select a venue that mirrors your style and comfortably fits your guest list.</p>
+                    </div>
+                    <div class="service-card reveal ripple">
+                        <i class="fas fa-users"
+                            style="font-size: 2rem; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h3 class="premium-font">Seating Plan</h3>
+                        <p>Arrange seating to encourage interaction while maintaining flow and comfort.</p>
+                    </div>
+                    <div class="service-card reveal ripple">
+                        <i class="fas fa-palette"
+                            style="font-size: 2rem; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h3 class="premium-font">Theme Ideas</h3>
+                        <p>Incorporate your personal story into the decor and color palette for a unique touch.</p>
+                    </div>
+                    <div class="service-card reveal ripple">
+                        <i class="fas fa-clock"
+                            style="font-size: 2rem; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h3 class="premium-font">Timeline</h3>
+                        <p>A well-planned timeline ensures every moment is special and stress-free.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="gallery">
             <div class="container">
                 <div class="section-title reveal">
@@ -383,6 +498,55 @@
                     <a href="tel:03086891083" class="btn"><i class="fas fa-phone"></i> Call Now</a>
                     <a href="https://wa.me/923086891083" class="btn"
                         style="background: #25d366; border-color: #25d366;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Availability Calendar -->
+        <section id="calendar" style="padding: 100px 0; background: var(--bg-cream);">
+            <div class="container">
+                <div class="heading-wrapper reveal">
+                    <span class="section-subtitle">Booking Status</span>
+                    <h2>Event Availability</h2>
+                    <div class="underline"></div>
+                    <p>Check our schedule and pick your perfect wedding date.</p>
+                </div>
+                <div class="calendar-grid reveal">
+                    <div class="calendar-day day-header">Mon</div>
+                    <div class="calendar-day day-header">Tue</div>
+                    <div class="calendar-day day-header">Wed</div>
+                    <div class="calendar-day day-header">Thu</div>
+                    <div class="calendar-day day-header">Fri</div>
+                    <div class="calendar-day day-header">Sat</div>
+                    <div class="calendar-day day-header">Sun</div>
+                    <!-- Mock days -->
+                    <div class="calendar-day available">1</div>
+                    <div class="calendar-day available">2</div>
+                    <div class="calendar-day booked">3</div>
+                    <div class="calendar-day available">4</div>
+                    <div class="calendar-day available">5</div>
+                    <div class="calendar-day booked">6</div>
+                    <div class="calendar-day available">7</div>
+                    <div class="calendar-day available">8</div>
+                    <div class="calendar-day booked">9</div>
+                    <div class="calendar-day available">10</div>
+                    <div class="calendar-day available">11</div>
+                    <div class="calendar-day available">12</div>
+                    <div class="calendar-day booked">13</div>
+                    <div class="calendar-day available">14</div>
+                    <div class="calendar-day booked">15</div>
+                    <div class="calendar-day available">16</div>
+                    <div class="calendar-day available">17</div>
+                    <div class="calendar-day booked">18</div>
+                    <div class="calendar-day available">19</div>
+                    <div class="calendar-day available">20</div>
+                    <div class="calendar-day booked">21</div>
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <span style="display: inline-block; margin: 0 10px;"><i class="fas fa-square"
+                            style="color: #d4edda;"></i> Available</span>
+                    <span style="display: inline-block; margin: 0 10px;"><i class="fas fa-square"
+                            style="color: #ff4d4d;"></i> Booked</span>
                 </div>
             </div>
         </section>

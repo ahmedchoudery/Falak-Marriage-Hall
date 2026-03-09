@@ -7,14 +7,26 @@
     /* Brighter Gold */
     --bg-cream: #F8F5F0;
     --text-dark: #1A1A1A;
+    --text-light: #F8F5F0;
     --white: #ffffff;
     --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    --bg-cream: #0A1C18;
+    /* Deep Dark Green */
+    --text-dark: #F8F5F0;
+    --white: #0F2A24;
+    --secondary: #000000;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 body {
@@ -36,6 +48,66 @@ h3,
 
 h1 {
     font-size: 48px;
+}
+
+/* Scroll Progress Bar */
+.progress-container {
+    position: fixed;
+    top: 0;
+    z-index: 2000;
+    width: 100%;
+    height: 3px;
+    background: transparent;
+}
+
+#progress-bar {
+    height: 100%;
+    background: var(--primary);
+    width: 0%;
+}
+
+/* Dark Mode Toggle */
+.theme-toggle {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--primary);
+    margin-left: 20px;
+}
+
+/* Advanced Headings */
+.section-subtitle {
+    display: block;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--primary);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.heading-wrapper {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.heading-wrapper .underline {
+    position: relative;
+    width: 80px;
+    height: 2px;
+    background: var(--primary);
+    margin: 20px auto;
+}
+
+.heading-wrapper .underline::after {
+    content: '✵';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-cream);
+    padding: 0 10px;
+    color: var(--primary);
+    font-size: 18px;
 }
 
 h2 {
@@ -80,11 +152,40 @@ p {
     }
 }
 
-/* Scroll-triggered Animations (AOS replacement/supplement) */
+/* Animations */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .reveal {
     opacity: 0;
     transform: translateY(30px);
     transition: var(--transition);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .reveal.active {
@@ -851,6 +952,235 @@ footer {
     z-index: 1000;
     text-decoration: none;
     transition: var(--transition);
+}
+
+/* Parallax Section */
+.parallax-section {
+    position: relative;
+    height: 400px;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+}
+
+.parallax-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 42, 36, 0.7);
+}
+
+/* Before/After Slider */
+.comparison-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    height: 500px;
+    overflow: hidden;
+    border: 5px solid var(--white);
+    box-shadow: var(--shadow);
+}
+
+.comparison-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.after-img {
+    width: 50%;
+    z-index: 2;
+    border-right: 2px solid var(--primary);
+}
+
+.slider-handle {
+    position: absolute;
+    z-index: 10;
+    top: 0;
+    bottom: 0px;
+    left: 50%;
+    width: 4px;
+    background: var(--primary);
+    cursor: ew-resize;
+    transform: translateX(-50%);
+}
+
+.slider-handle::after {
+    content: '↔';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Sticky CTA Bar */
+.sticky-cta {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--primary);
+    display: flex;
+    z-index: 1001;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.sticky-cta.visible {
+    transform: translateY(0);
+}
+
+.cta-btn {
+    flex: 1;
+    padding: 15px;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cta-btn:last-child {
+    border-right: none;
+    background: #25d366;
+    /* WhatsApp Green */
+}
+
+/* Availability Calendar */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    max-width: 600px;
+    margin: 30px auto;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    font-weight: 600;
+    border-radius: 5px;
+    position: relative;
+    cursor: pointer;
+}
+
+.day-header {
+    background: transparent;
+    color: var(--primary);
+    font-size: 12px;
+}
+
+.booked {
+    background: #ff4d4d;
+    color: white;
+    cursor: not-allowed;
+}
+
+.available {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* Lightbox V2 Modal */
+.lightbox-active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    cursor: zoom-out;
+}
+
+.lightbox-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    animation: zoomIn 0.3s ease;
+}
+
+.lightbox-content img {
+    width: 100%;
+    height: auto;
+    border: 5px solid white;
+}
+
+.close-lightbox {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+/* Micro-interactions */
+.btn:active,
+.service-card:active {
+    transform: scale(0.95);
+}
+
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple::after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform 0.5s, opacity 1s;
+}
+
+.ripple:active::after {
+    transform: scale(0, 0);
+    opacity: 0.3;
+    transition: 0s;
 }
 
 .whatsapp-float:hover {
