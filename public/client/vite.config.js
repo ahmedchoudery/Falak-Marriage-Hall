@@ -13,7 +13,9 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../public',
+    // Build into the server-served root `/public` directory.
+    // Current file is `public/client/vite.config.js`, so we need `../../public`.
+    outDir: '../../public',
     emptyOutDir: false, // preserve existing images/files in public/
     rollupOptions: {
       output: {

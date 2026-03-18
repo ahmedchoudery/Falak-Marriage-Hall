@@ -95,7 +95,7 @@ export default function ContactPage() {
                 <Link to="/booking" className="btn btn-gold" style={{ flex: 1, justifyContent: 'center', minWidth: 160 }}>
                   <i className="fas fa-calendar-check" /> Book Now
                 </Link>
-                <a href="https://maps.app.goo.gl/YourActualLinkGoesHere" target="_blank" rel="noreferrer"
+                <a href="https://maps.app.goo.gl/tCKXtTQEV2rjiqJs8" target="_blank" rel="noreferrer"
                   className="btn btn-outline" style={{ flex: 1, justifyContent: 'center', minWidth: 160 }}>
                   <i className="fas fa-directions" /> Get Directions
                 </a>

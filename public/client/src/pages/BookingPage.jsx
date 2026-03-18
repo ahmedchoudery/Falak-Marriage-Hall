@@ -54,7 +54,8 @@ export default function BookingPage() {
     if (!form.phone.trim())         e.phone     = 'Phone number is required'
     if (!form.eventDate)            e.eventDate = 'Please select an event date'
     if (!form.eventType)            e.eventType = 'Please select event type'
-    if (!form.guests || form.guests < 1) e.guests = 'Please enter estimated guest count'
+    const guestsNum = Number(form.guests)
+    if (!Number.isFinite(guestsNum) || guestsNum < 1) e.guests = 'Please enter estimated guest count'
     return e
   }
 
@@ -71,9 +72,9 @@ export default function BookingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
-      const data = await res.json()
+      const data = await res.json().catch(() => ({}))
 
-      if (data.success) {
+      if (res.ok && data.success) {
         setSubmitted(true)
         // Animate success icon
         setTimeout(() => {
@@ -86,7 +87,7 @@ export default function BookingPage() {
           })
         }, 50)
       } else {
-        alert('Error: ' + data.message)
+        alert('Error: ' + (data.message || 'Unable to submit booking. Please try again.'))
       }
     } catch {
       alert('Network error. Please call us directly: 0308-6891083')

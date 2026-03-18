@@ -17,14 +17,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB connection
 let cachedDb = null;
+let cachedClient = null;
 const MONGODB_URI = process.env.MONGODB_URI;
 
 async function connectDB() {
     if (cachedDb) return cachedDb;
+    if (!MONGODB_URI) {
+        const err = new Error('Missing MONGODB_URI');
+        err.code = 'MISSING_MONGODB_URI';
+        throw err;
+    }
     try {
-        const client = new MongoClient(MONGODB_URI);
-        await client.connect();
-        const db = client.db('falak_hall');
+        cachedClient = cachedClient || new MongoClient(MONGODB_URI);
+        await cachedClient.connect();
+        const db = cachedClient.db('falak_hall');
         cachedDb = db;
         console.log('✅ Connected to MongoDB Atlas');
         return db;
@@ -70,6 +76,12 @@ app.post('/api/booking', async (req, res) => {
             bookingId: result.insertedId
         });
     } catch (error) {
+        if (error && error.code === 'MISSING_MONGODB_URI') {
+            return res.status(500).json({
+                success: false,
+                message: 'Server is missing database configuration.'
+            });
+        }
         console.error('Booking error:', error);
         res.status(500).json({
             success: false,
@@ -83,6 +95,16 @@ app.post('/api/booking', async (req, res) => {
 // ─────────────────────────────────────────────
 app.get('/api/bookings', async (req, res) => {
     try {
+        // Minimal protection to avoid exposing customer data publicly.
+        // Set `ADMIN_TOKEN` in environment and call with header: `x-admin-token: <token>`.
+        const adminToken = process.env.ADMIN_TOKEN;
+        if (adminToken) {
+            const provided = req.get('x-admin-token');
+            if (!provided || provided !== adminToken) {
+                return res.status(401).json({ success: false, message: 'Unauthorized.' });
+            }
+        }
+
         const db = await connectDB();
         const bookings = await db.collection('bookings')
             .find({})
@@ -90,6 +112,9 @@ app.get('/api/bookings', async (req, res) => {
             .toArray();
         res.json({ success: true, data: bookings });
     } catch (error) {
+        if (error && error.code === 'MISSING_MONGODB_URI') {
+            return res.status(500).json({ success: false, message: 'Server is missing database configuration.' });
+        }
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
