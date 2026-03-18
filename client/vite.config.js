@@ -13,9 +13,9 @@ export default defineConfig({
     },
   },
   build: {
-    // Build into the server-served root `/public` directory.
-    // Current file is `client/vite.config.js`, so we need `../public`.
-    outDir: '../public',
+    // Build into the server-served root `/dist` directory.
+    // Current file is `client/vite.config.js`, so we need `../dist`.
+    outDir: '../dist',
     emptyOutDir: true, // clean root public/ before build
     rollupOptions: {
       output: {

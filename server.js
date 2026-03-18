@@ -21,7 +21,7 @@ app.use((req, res, next) => {
 // Manual Asset Routing (for debugging and robustness)
 app.get('/assets/:file', (req, res) => {
     const fs = require('fs');
-    const filePath = path.join(process.cwd(), 'public', 'assets', req.params.file);
+    const filePath = path.join(process.cwd(), 'dist', 'assets', req.params.file);
     if (fs.existsSync(filePath)) {
         // Set correct MIME type
         if (req.params.file.endsWith('.js')) res.setHeader('Content-Type', 'application/javascript');
@@ -33,10 +33,10 @@ app.get('/assets/:file', (req, res) => {
     }
 });
 
-// Serve static files from /public (React build output)
-const publicPath = path.resolve(process.cwd(), 'public');
-console.log(`Static root: ${publicPath}`);
-app.use(express.static(publicPath));
+// Serve static files from /dist (React build output)
+const distPath = path.resolve(process.cwd(), 'dist');
+console.log(`Static root: ${distPath}`);
+app.use(express.static(distPath));
 
 // MongoDB connection
 let cachedDb = null;
@@ -146,7 +146,7 @@ app.get('/api/bookings', async (req, res) => {
 // SPA Fallback — React Router (must be LAST)
 // ─────────────────────────────────────────────
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.resolve(process.cwd(), 'dist', 'index.html'));
 });
 
 // Start server
