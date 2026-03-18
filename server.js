@@ -12,8 +12,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Request logger
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
+
 // Serve static files from /public (React build output)
-app.use(express.static(path.join(__dirname, 'public')));
+const publicPath = path.resolve(__dirname, 'public');
+app.use(express.static(publicPath));
 
 // MongoDB connection
 let cachedDb = null;
