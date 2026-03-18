@@ -38,14 +38,14 @@ async function connectDB() {
     });
     await client.connect();
     cachedDb = client.db('falak_hall_db');
-    console.log('Connected to MongoDB');
+    console.log('✅ Connected to MongoDB');
     return cachedDb;
 }
 
-// Admin auth middleware
+// Admin auth middleware — checks x-admin-token header
 function adminAuth(req, res, next) {
     const token = req.headers['x-admin-token'];
-    if (!token || token !== process.env.ADMIN_PASSWORD) {
+    if (!token || token !== process.env.ADMIN_TOKEN) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     next();
@@ -95,11 +95,19 @@ app.get('/api/availability', async (req, res) => {
 
 // ── ADMIN API ──────────────────────────────────────────
 
+// Login — checks username AND token (password)
 app.post('/api/admin/login', (req, res) => {
-    const { password } = req.body;
-    if (!password || password !== process.env.ADMIN_PASSWORD)
-        return res.status(401).json({ success: false, message: 'Invalid password.' });
-    res.json({ success: true, token: process.env.ADMIN_PASSWORD });
+    const { username, password } = req.body;
+    const validUsername = 'ahmedchoudery1';
+    const validToken = process.env.ADMIN_TOKEN;
+
+    if (!username || !password) {
+        return res.status(400).json({ success: false, message: 'Username and password required.' });
+    }
+    if (username !== validUsername || password !== validToken) {
+        return res.status(401).json({ success: false, message: 'Invalid username or password.' });
+    }
+    res.json({ success: true, token: validToken });
 });
 
 app.get('/api/admin/bookings', adminAuth, async (req, res) => {
@@ -155,8 +163,11 @@ app.put('/api/admin/bookings/:id', adminAuth, async (req, res) => {
         if (guests !== undefined) updateData.guests = parseInt(guests) || 0;
         if (message !== undefined) updateData.message = message;
         if (status) updateData.status = status;
-        const result = await db.collection('bookings').updateOne({ _id: new ObjectId(id) }, { $set: updateData });
-        if (result.matchedCount === 0) return res.status(404).json({ success: false, message: 'Booking not found.' });
+        const result = await db.collection('bookings').updateOne(
+            { _id: new ObjectId(id) }, { $set: updateData }
+        );
+        if (result.matchedCount === 0)
+            return res.status(404).json({ success: false, message: 'Booking not found.' });
         if (status === 'approved' && eventDate) {
             await db.collection('availability').updateOne(
                 { date: eventDate },
@@ -178,7 +189,8 @@ app.delete('/api/admin/bookings/:id', adminAuth, async (req, res) => {
         if (!ObjectId.isValid(id)) return res.status(400).json({ success: false, message: 'Invalid ID.' });
         const booking = await db.collection('bookings').findOne({ _id: new ObjectId(id) });
         const result = await db.collection('bookings').deleteOne({ _id: new ObjectId(id) });
-        if (result.deletedCount === 0) return res.status(404).json({ success: false, message: 'Booking not found.' });
+        if (result.deletedCount === 0)
+            return res.status(404).json({ success: false, message: 'Booking not found.' });
         if (booking?.eventDate) await db.collection('availability').deleteOne({ date: booking.eventDate });
         res.json({ success: true, message: 'Booking deleted.' });
     } catch (error) { res.status(500).json({ success: false, message: 'Server error.' }); }
@@ -196,7 +208,8 @@ app.post('/api/admin/availability', adminAuth, async (req, res) => {
     try {
         const db = await connectDB();
         const { date, status } = req.body;
-        if (!date || !status) return res.status(400).json({ success: false, message: 'Date and status required.' });
+        if (!date || !status)
+            return res.status(400).json({ success: false, message: 'Date and status required.' });
         if (status === 'available') {
             await db.collection('availability').deleteOne({ date });
         } else {
@@ -217,7 +230,7 @@ app.get('*', (req, res) => {
 
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, async () => {
-        console.log(`Falak Hall server → http://localhost:${PORT}`);
+        console.log(`🏛️  Falak Hall server → http://localhost:${PORT}`);
         try { await connectDB(); } catch (e) { console.error('DB failed:', e.message); }
     });
 }
