@@ -14,12 +14,28 @@ app.use(express.urlencoded({ extended: true }));
 
 // Request logger
 app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
     next();
 });
 
+// Manual Asset Routing (for debugging and robustness)
+app.get('/assets/:file', (req, res) => {
+    const fs = require('fs');
+    const filePath = path.join(process.cwd(), 'public', 'assets', req.params.file);
+    if (fs.existsSync(filePath)) {
+        // Set correct MIME type
+        if (req.params.file.endsWith('.js')) res.setHeader('Content-Type', 'application/javascript');
+        if (req.params.file.endsWith('.css')) res.setHeader('Content-Type', 'text/css');
+        res.sendFile(filePath);
+    } else {
+        console.error(`[ASSET 404] ${req.params.file} not found at ${filePath}`);
+        next(); // fall through to catch-all (which serves index.html)
+    }
+});
+
 // Serve static files from /public (React build output)
-const publicPath = path.resolve(__dirname, 'public');
+const publicPath = path.resolve(process.cwd(), 'public');
+console.log(`Static root: ${publicPath}`);
 app.use(express.static(publicPath));
 
 // MongoDB connection
