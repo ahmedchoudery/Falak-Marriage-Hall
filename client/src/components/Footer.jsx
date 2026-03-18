@@ -100,6 +100,9 @@ export default function Footer() {
       >
         <i className="fab fa-whatsapp" />
       </a>
+      <a href="/admin" style={{ position: 'fixed', bottom: 8, left: 8, fontSize: '0.55rem', opacity: 0.15, color: 'var(--text-muted)' }}>
+        Admin
+      </a>
     </footer>
   )
 }
