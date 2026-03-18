@@ -1,0 +1,51 @@
+Reorganize project structure: Move React source to client/, consolidate frontend, and clean up redundant static files
+
+# Conflicts:
+#	client/package-lock.json
+#	public/index.html
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# interactive rebase in progress; onto 5410354
+# Last command done (1 command done):
+#    pick 2173029 # Reorganize project structure: Move React source to client/, consolidate frontend, and clean up redundant static files
+# No commands remaining.
+# You are currently rebasing branch 'main' on '5410354'.
+#
+# Changes to be committed:
+#	deleted:    Untitled design.png
+#	renamed:    public/client/index.html -> client/index.html
+#	renamed:    public/client/package-lock.json -> client/package-lock.json
+#	renamed:    public/client/package.json -> client/package.json
+#	renamed:    public/client/src/App.jsx -> client/src/App.jsx
+#	renamed:    public/client/src/components/About.jsx -> client/src/components/About.jsx
+#	renamed:    public/client/src/components/AvailabilityCalendar.jsx -> client/src/components/AvailabilityCalendar.jsx
+#	renamed:    public/client/src/components/CTASection.jsx -> client/src/components/CTASection.jsx
+#	renamed:    public/client/src/components/Cursor.jsx -> client/src/components/Cursor.jsx
+#	renamed:    public/client/src/components/Footer.jsx -> client/src/components/Footer.jsx
+#	renamed:    public/client/src/components/Gallery.jsx -> client/src/components/Gallery.jsx
+#	renamed:    public/client/src/components/Hero.jsx -> client/src/components/Hero.jsx
+#	renamed:    public/client/src/components/Loader.jsx -> client/src/components/Loader.jsx
+#	renamed:    public/client/src/components/Location.jsx -> client/src/components/Location.jsx
+#	renamed:    public/client/src/components/Navbar.jsx -> client/src/components/Navbar.jsx
+#	renamed:    public/client/src/components/Packages.jsx -> client/src/components/Packages.jsx
+#	renamed:    public/client/src/components/ParallaxBanner.jsx -> client/src/components/ParallaxBanner.jsx
+#	renamed:    public/client/src/components/Services.jsx -> client/src/components/Services.jsx
+#	renamed:    public/client/src/components/Stats.jsx -> client/src/components/Stats.jsx
+#	renamed:    public/client/src/components/Testimonials.jsx -> client/src/components/Testimonials.jsx
+#	renamed:    public/client/src/components/Timeline.jsx -> client/src/components/Timeline.jsx
+#	renamed:    public/client/src/hooks/useReveal.js -> client/src/hooks/useReveal.js
+#	renamed:    public/client/src/index.css -> client/src/index.css
+#	renamed:    public/client/src/main.jsx -> client/src/main.jsx
+#	renamed:    public/client/src/pages/BookingPage.jsx -> client/src/pages/BookingPage.jsx
+#	renamed:    public/client/src/pages/ContactPage.jsx -> client/src/pages/ContactPage.jsx
+#	renamed:    public/client/src/pages/Home.jsx -> client/src/pages/Home.jsx
+#	renamed:    public/client/vite.config.js -> client/vite.config.js
+#	new file:   public/assets/index-C18Guf5I.js
+#	deleted:    public/booking.html
+#	deleted:    public/contact.html
+#	deleted:    public/css/style.css
+#	modified:   public/index.html
+#	deleted:    public/js/main.js
+#

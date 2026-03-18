@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "cd public/client && npm install && npm run build",
-    "install:all": "npm install && cd public/client && npm install"
+    "build": "cd client && npm install && npm run build",
+    "install:all": "npm install && cd client && npm install"
   },
   "keywords": [
     "marriage-hall",
