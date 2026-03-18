@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "Professional MERN website for Falak Hall & Events - Marriage Hall, GT Road Gujrat",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",

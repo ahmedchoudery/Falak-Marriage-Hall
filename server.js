@@ -1,13 +1,19 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const { MongoClient } = require('mongodb');
-const path = require('path');
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import { MongoClient, ServerApiVersion } from 'mongodb';
+import fs from 'fs';
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -19,8 +25,7 @@ app.use((req, res, next) => {
 });
 
 // Manual Asset Routing (for debugging and robustness)
-app.get('/assets/:file', (req, res) => {
-    const fs = require('fs');
+app.get('/assets/:file', (req, res, next) => {
     const filePath = path.join(process.cwd(), 'dist', 'assets', req.params.file);
     if (fs.existsSync(filePath)) {
         // Set correct MIME type
@@ -40,109 +45,53 @@ app.use(express.static(distPath));
 
 // MongoDB connection
 let cachedDb = null;
-let cachedClient = null;
-const MONGODB_URI = process.env.MONGODB_URI;
 
-async function connectDB() {
+async function connectToDatabase() {
     if (cachedDb) return cachedDb;
-    if (!MONGODB_URI) {
-        const err = new Error('Missing MONGODB_URI');
-        err.code = 'MISSING_MONGODB_URI';
-        throw err;
+    
+    if (!process.env.MONGODB_URI) {
+        throw new Error('Please define the MONGODB_URI environment variable');
     }
+
+    const client = new MongoClient(process.env.MONGODB_URI, {
+        serverApi: {
+            version: ServerApiVersion.v1,
+            strict: true,
+            deprecationErrors: true,
+        }
+    });
+
     try {
-        cachedClient = cachedClient || new MongoClient(MONGODB_URI);
-        await cachedClient.connect();
-        const db = cachedClient.db('falak_hall');
-        cachedDb = db;
-        console.log('✅ Connected to MongoDB Atlas');
-        return db;
+        await client.connect();
+        console.log("Successfully connected to MongoDB");
+        cachedDb = client.db('falak_hall_db'); // Replace with your DB name
+        return cachedDb;
     } catch (error) {
-        console.error('❌ MongoDB connection error:', error.message);
+        console.error("MongoDB connection error:", error);
         throw error;
     }
 }
 
-// ─────────────────────────────────────────────
-// API: Submit booking
-// ─────────────────────────────────────────────
+// API Routes
 app.post('/api/booking', async (req, res) => {
     try {
-        const db = await connectDB();
-        const { name, phone, email, eventDate, eventType, hall, guests, message } = req.body;
-
-        if (!name || !phone || !eventDate || !eventType) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please fill in all required fields.'
-            });
-        }
-
-        const booking = {
-            name,
-            phone,
-            email: email || '',
-            eventDate,
-            eventType,
-            hall: hall || 'Any',
-            guests: parseInt(guests) || 0,
-            message: message || '',
-            status: 'pending',
-            createdAt: new Date()
+        const db = await connectToDatabase();
+        const bookings = db.collection('bookings');
+        
+        const bookingData = {
+            ...req.body,
+            createdAt: new Date(),
+            status: 'pending'
         };
 
-        const result = await db.collection('bookings').insertOne(booking);
-
-        res.status(201).json({
-            success: true,
-            message: 'Booking request submitted successfully! We will contact you shortly.',
-            bookingId: result.insertedId
-        });
+        const result = await bookings.insertOne(bookingData);
+        res.status(201).json({ success: true, message: 'Booking inquiry received!', id: result.insertedId });
     } catch (error) {
-        if (error && error.code === 'MISSING_MONGODB_URI') {
-            return res.status(500).json({
-                success: false,
-                message: 'Server is missing database configuration.'
-            });
-        }
-        console.error('Booking error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Something went wrong. Please contact us directly.'
-        });
+        console.error('Booking submission error:', error);
+        res.status(500).json({ success: false, message: 'Internal server error. Please try again later.' });
     }
 });
 
-// ─────────────────────────────────────────────
-// API: Get all bookings (admin use)
-// ─────────────────────────────────────────────
-app.get('/api/bookings', async (req, res) => {
-    try {
-        // Minimal protection to avoid exposing customer data publicly.
-        // Set `ADMIN_TOKEN` in environment and call with header: `x-admin-token: <token>`.
-        const adminToken = process.env.ADMIN_TOKEN;
-        if (adminToken) {
-            const provided = req.get('x-admin-token');
-            if (!provided || provided !== adminToken) {
-                return res.status(401).json({ success: false, message: 'Unauthorized.' });
-            }
-        }
-
-        const db = await connectDB();
-        const bookings = await db.collection('bookings')
-            .find({})
-            .sort({ createdAt: -1 })
-            .toArray();
-        res.json({ success: true, data: bookings });
-    } catch (error) {
-        if (error && error.code === 'MISSING_MONGODB_URI') {
-            return res.status(500).json({ success: false, message: 'Server is missing database configuration.' });
-        }
-        res.status(500).json({ success: false, message: 'Server error.' });
-    }
-});
-
-// ─────────────────────────────────────────────
 // SPA Fallback — React Router (must be LAST)
 // ─────────────────────────────────────────────
 app.get('*', (req, res) => {
@@ -150,14 +99,10 @@ app.get('*', (req, res) => {
 });
 
 // Start server
-if (require.main === module) {
-    app.listen(PORT, async () => {
-        console.log(`🏛️  Falak Hall & Events server running on http://localhost:${PORT}`);
-        if (MONGODB_URI) {
-            try { await connectDB(); }
-            catch (err) { console.error('Database connection failed on startup'); }
-        }
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server is running at http://localhost:${PORT}`);
     });
 }
 
-module.exports = app;
+export default app;
