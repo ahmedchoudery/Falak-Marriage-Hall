@@ -12,6 +12,28 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Debug endpoint
+app.get('/api/debug-files', (req, res) => {
+    const fs = require('fs');
+    const walk = (dir) => {
+        let results = [];
+        const list = fs.readdirSync(dir);
+        list.forEach(file => {
+            const filePath = path.join(dir, file);
+            const stat = fs.statSync(filePath);
+            if (stat.isDirectory()) results = results.concat(walk(filePath));
+            else results.push(filePath);
+        });
+        return results;
+    };
+    try {
+        const files = walk(path.join(__dirname, 'public'));
+        res.json({ dirname: __dirname, files });
+    } catch (e) {
+        res.json({ error: e.message });
+    }
+});
+
 // Serve static files from /public (React build output)
 app.use(express.static(path.join(__dirname, 'public')));
 
