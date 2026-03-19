@@ -1,74 +1,63 @@
 # 🏛️ Falak Hall & Events — MERN Website v2.0
 
-React + Vite + Node.js + MongoDB — complete production-grade wedding venue website.
+A high-performance, premium wedding venue website built with React, Vite, Node.js, and MongoDB.
 
 ## ✨ Features
-- Three.js gold particle hero with mouse parallax
-- Anime.js character text reveals + staggered entrances
-- Custom gold spring-follow cursor
-- Dual infinite scrolling gallery with lightbox
-- Swiper testimonial carousel
-- Interactive availability calendar
-- Booking form → MongoDB with validation
-- SEO: Schema.org, Open Graph, semantic HTML
-- Mobile responsive with slide-out menu
-- Code split chunks (vendor/three/swiper/anime)
+- **Premium UI**: Three.js particle hero, Anime.js reveals, and custom functional cursors.
+- **Admin Dashboard**: Secure management portal (`/admin`) for bookings and hall availability.
+- **Seamless Booking**: Interactive calendar with real-time availability synchronization.
+- **Notifications**: Automatic Email (Resend) and WhatsApp redirection for every new booking.
+- **SEO & Performance**: 100% responsive, optimized caching, Schema.org, and Open Graph meta tags.
 
 ## 🚀 Setup
 
-### 1. Create .env in project root
-```
-MONGODB_URI=your_mongodb_atlas_connection_string
+### 1. Environment Variables (`.env`)
+Create a `.env` file in the root with:
+```env
+MONGODB_URI=your_mongodb_atlas_uri
 PORT=3000
+ADMIN_TOKEN=your_secure_random_string
+ADMIN_EMAIL=your_notification_email
+RESEND_API_KEY=your_resend_api_key
 ```
 
-### 2. Copy your images to client/public too
-```bash
-mkdir -p public/client/public/images
-cp public/images/* public/client/public/images/
-cp public/favicon_new.png public/client/public/
-```
-
-### 3. Install everything
+### 2. Install Dependencies
 ```bash
 npm install
-cd public/client && npm install && cd ../..
+cd client && npm install
 ```
 
-### 4. Build React → /public
+### 3. Build & Run
 ```bash
-cd public/client && npm run build && cd ../..
-```
-
-### 5. Start
-```bash
+# Production Build
+cd client && npm run build
+cd ..
 npm start
-# → http://localhost:3000
+
+# Development (Dual terminal)
+# T1 (Server): npm run dev
+# T2 (Client): cd client && npm run dev
 ```
 
-## 💻 Dev Mode (hot reload)
-```bash
-# Terminal 1:
-npm run dev          # backend on :3000
+## ☁️ Vercel Deployment
 
-# Terminal 2:
-cd public/client && npm run dev   # frontend on :5173 (proxies API to :3000)
-```
+1.  **Push to GitHub**: Connect your repository to Vercel.
+2.  **Environment Variables**: Add all variables from your `.env` to the Vercel Dashboard.
+3.  **Auto-Deploy**: Vercel will automatically build and deploy based on the `vercel.json` configuration.
 
-## ☁️ Vercel Deploy
-1. Push to GitHub
-2. Connect to Vercel
-3. Add env var: MONGODB_URI
-4. Push → auto deploys
+## 🎨 Professional Management
 
-## 🎨 Customize
-- **Colors:** `public/client/src/index.css` → `:root` variables
-- **Phone/Email:** Search `0308-6891083` across all files
-- **Booked dates:** `public/client/src/components/AvailabilityCalendar.jsx` → `BOOKED_DAYS` Set
-- **Social links:** `public/client/src/components/Footer.jsx` → social icon hrefs
-- **Maps link:** `public/client/src/pages/ContactPage.jsx` → "Get Directions" href
+-   **Updating Booked Dates**: No code changes needed! Log in to `/admin` to approve bookings or manually block dates on the calendar.
+-   **Emails**: Ensure `RESEND_API_KEY` is active to receive booking alerts at your `ADMIN_EMAIL`.
+-   **Customization**:
+    -   **Colors/Fonts**: Edit `client/src/index.css`.
+    -   **Business Info**: Search and update `0308-6891083` for phone and `info@falakhall.com` for email.
 
-## 📞 API
-- `POST /api/booking` — submit booking (saved to MongoDB)
-- `GET  /api/bookings` — get all bookings
+## 📞 API Documentation
+-   `POST /api/booking`: Submit a new booking inquiry.
+-   `GET /api/availability`: Fetch currently booked/blocked dates.
+-   `POST /api/admin/bookings`: (Protected) Fetch/Update booking statuses.
+
+---
+*Created with care for Falak Marriage Hall, Gujrat.*
 

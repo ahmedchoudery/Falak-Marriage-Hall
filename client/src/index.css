@@ -1499,9 +1499,15 @@ section {
 }
 
 .contact-item-value {
+  display: block;
   font-size: 0.9rem;
   color: var(--text);
   line-height: 1.6;
+  transition: color 0.3s ease;
+}
+
+a.contact-item-value:hover {
+  color: var(--gold);
 }
 
 /* ─── Footer ─────────────────────────────────────────── */

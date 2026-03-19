@@ -81,9 +81,6 @@ export default function Location() {
                       target={item.href.startsWith('http') ? '_blank' : undefined}
                       rel="noreferrer"
                       className="contact-item-value"
-                      style={{ display: 'block', color: 'var(--text)', transition: 'color .3s' }}
-                      onMouseEnter={(e) => e.target.style.color = 'var(--gold)'}
-                      onMouseLeave={(e) => e.target.style.color = 'var(--text)'}
                     >
                       {item.value}
                     </a>
