@@ -89,6 +89,7 @@ export default function AvailabilityCalendar() {
           <div className="calendar-header">
             <button
               onClick={prevMonth}
+              aria-label="Previous Month"
               style={{ background: 'none', border: '1px solid var(--gold-border)', color: 'var(--gold)', width: 36, height: 36, borderRadius: 'var(--radius)', transition: 'all .3s' }}
               className="hoverable"
             >
@@ -97,6 +98,7 @@ export default function AvailabilityCalendar() {
             <h3>{MONTHS[month]} {year}</h3>
             <button
               onClick={nextMonth}
+              aria-label="Next Month"
               style={{ background: 'none', border: '1px solid var(--gold-border)', color: 'var(--gold)', width: 36, height: 36, borderRadius: 'var(--radius)', transition: 'all .3s' }}
               className="hoverable"
             >

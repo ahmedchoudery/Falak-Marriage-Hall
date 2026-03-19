@@ -1892,6 +1892,10 @@ select.form-control option {
     display: flex;
   }
 
+  .admin-sidebar {
+    display: none;
+  }
+
   .services-grid {
     grid-template-columns: 1fr;
   }
@@ -1952,10 +1956,6 @@ select.form-control option {
   .cursor-dot,
   .cursor-ring {
     display: none;
-  }
-
-  * {
-    cursor: auto !important;
   }
 
   .about-image-stack {
@@ -2027,8 +2027,10 @@ select.form-control option {
   cursor: auto;
 }
 
-* {
-  cursor: auto !important;
+.admin-wrap {
+  display: flex;
+  min-height: 100vh;
+  background: var(--dark);
 }
 
 /* Sidebar */
@@ -2235,6 +2237,7 @@ select.form-control option {
   overflow-x: auto;
   border: 1px solid var(--gold-border);
   border-radius: var(--radius);
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-table {
