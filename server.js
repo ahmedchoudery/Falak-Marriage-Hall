@@ -212,6 +212,7 @@ app.put('/api/admin/bookings/:id', adminAuth, async (req, res) => {
         if (hall) updateData.hall = hall;
         if (guests !== undefined) updateData.guests = parseInt(guests) || 0;
         if (message !== undefined) updateData.message = message;
+        if (status) updateData.status = status;
         const oldBooking = await db.collection('bookings').findOne({ _id: new ObjectId(id) });
         if (!oldBooking) return res.status(404).json({ success: false, message: 'Booking not found.' });
 
