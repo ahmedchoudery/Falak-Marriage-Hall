@@ -359,10 +359,13 @@ section {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 60px;
+  gap: clamp(20px, 4vw, 50px);
+  padding: 0 20px;
 }
 
 .nav-logo {
+  flex-shrink: 0;
+  margin-right: auto; /* Push links and CTA away from the logo if needed */
   font-family: var(--font-display);
   font-size: 1.6rem;
   font-weight: 700;
@@ -380,7 +383,7 @@ section {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 50px;
+  gap: clamp(15px, 2.5vw, 50px);
   list-style: none;
 }
 
@@ -417,6 +420,7 @@ section {
 }
 
 .nav-cta {
+  flex-shrink: 0;
   background: var(--gold);
   border: 1px solid var(--gold);
   color: var(--dark);
