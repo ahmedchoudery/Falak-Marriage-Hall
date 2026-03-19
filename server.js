@@ -17,12 +17,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static assets
+// Manual Asset Routing
 app.get('/assets/:file', (req, res, next) => {
     const filePath = path.join(process.cwd(), 'dist', 'assets', req.params.file);
     if (fs.existsSync(filePath)) {
         if (req.params.file.endsWith('.js')) res.setHeader('Content-Type', 'application/javascript');
         if (req.params.file.endsWith('.css')) res.setHeader('Content-Type', 'text/css');
+        // Assets with hashes can be cached!
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         res.sendFile(filePath);
     } else { next(); }
 });
@@ -223,8 +225,12 @@ app.post('/api/admin/availability', adminAuth, async (req, res) => {
     } catch (error) { res.status(500).json({ success: false, message: 'Server error.' }); }
 });
 
-// SPA fallback
+// SPA fallback — disable caching for index.html
 app.get('*', (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
     res.sendFile(path.resolve(process.cwd(), 'dist', 'index.html'));
 });
 
