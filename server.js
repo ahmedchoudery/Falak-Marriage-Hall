@@ -58,6 +58,16 @@ function adminAuth(req, res, next) {
     next();
 }
 
+// Global No-Cache for API
+function noCache(req, res, next) {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+}
+
+app.use('/api', noCache);
+
 // ── PUBLIC API ─────────────────────────────────────────
 
 app.post('/api/booking', async (req, res) => {
@@ -78,6 +88,13 @@ app.post('/api/booking', async (req, res) => {
             createdAt: new Date(),
         };
         const result = await db.collection('bookings').insertOne(newBooking);
+        
+        // Immediate block for public inquiries
+        await db.collection('availability').updateOne(
+            { date: eventDate },
+            { $set: { date: eventDate, status: 'booked', bookingId: result.insertedId, source: 'online' } },
+            { upsert: true }
+        );
 
 
         // ── Admin Notification: Email via Resend ──
