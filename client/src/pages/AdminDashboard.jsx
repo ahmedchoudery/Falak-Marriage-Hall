@@ -368,6 +368,21 @@ export default function AdminDashboard() {
                                 <h1 className="admin-page-title">Availability</h1>
                                 <p className="admin-page-sub">Block or unblock dates manually</p>
                             </div>
+                            <button 
+                                className="admin-btn-ghost" 
+                                onClick={async () => {
+                                    if (!confirm('Re-sync availability table from all approved bookings? This will fix calendar discrepancies.')) return;
+                                    try {
+                                        const res = await fetch('/api/admin/availability/sync', { method: 'POST', headers: apiHeaders });
+                                        const data = await res.json();
+                                        if (data.success) { showToast('Availability synced!'); fetchAvailability(); }
+                                        else showToast(data.message, 'error');
+                                    } catch { showToast('Sync failed.', 'error'); }
+                                }}
+                                style={{ fontSize: '0.75rem' }}
+                            >
+                                <i className="fas fa-sync-alt" /> Fix/Sync Calendar
+                            </button>
                         </div>
 
                         {/* Block date form */}

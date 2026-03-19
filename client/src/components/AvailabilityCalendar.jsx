@@ -1,9 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useReveal } from '../hooks/useReveal'
 import { Link } from 'react-router-dom'
-
-// Mock booked dates (replace with API call later)
-const BOOKED_DAYS = new Set([3, 6, 9, 13, 15, 18, 21, 24, 27])
 
 const DAYS   = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
@@ -13,7 +10,6 @@ function getDaysInMonth(year, month) {
 }
 
 function getFirstDayOfMonth(year, month) {
-  // 0=Sun … 6=Sat → convert to Mon-start
   const day = new Date(year, month, 1).getDay()
   return (day === 0) ? 6 : day - 1
 }
@@ -22,7 +18,27 @@ export default function AvailabilityCalendar() {
   const today = new Date()
   const [year,  setYear]  = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
+  const [bookedDates, setBookedDates] = useState([])
+  const [loading, setLoading] = useState(true)
   const [headRef, headVisible] = useReveal()
+
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      try {
+        const res = await fetch('/api/availability')
+        const data = await res.json()
+        if (data.success) {
+          // Store only the dates as a simple array for easy checking
+          setBookedDates(data.data.map(d => d.date))
+        }
+      } catch (err) {
+        console.error('Failed to fetch availability:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchAvailability()
+  }, [])
 
   const daysInMonth = getDaysInMonth(year, month)
   const firstDay    = getFirstDayOfMonth(year, month)
@@ -38,13 +54,19 @@ export default function AvailabilityCalendar() {
   }
 
   const cells = []
-  // Empty cells for offset
   for (let i = 0; i < firstDay; i++) cells.push({ empty: true })
-  // Day cells
+  
   for (let d = 1; d <= daysInMonth; d++) {
+    // Format: YYYY-MM-DD
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
     const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear()
     const isPast  = new Date(year, month, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate())
-    cells.push({ day: d, booked: BOOKED_DAYS.has(d), isToday, isPast })
+    cells.push({ 
+      day: d, 
+      booked: bookedDates.includes(dateStr), 
+      isToday, 
+      isPast 
+    })
   }
 
   return (

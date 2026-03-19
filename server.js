@@ -267,6 +267,42 @@ app.post('/api/admin/availability', adminAuth, async (req, res) => {
     } catch (error) { res.status(500).json({ success: false, message: 'Server error.' }); }
 });
 
+// Maintenance: Re-sync availability table from approved bookings
+app.post('/api/admin/availability/sync', adminAuth, async (req, res) => {
+    try {
+        const db = await connectDB();
+        
+        // 1. Get all approved bookings
+        const approvedBookings = await db.collection('bookings').find({ status: 'approved' }).toArray();
+        
+        // 2. Get all manual blocks (don't want to lose them!)
+        const manualBlocks = await db.collection('availability').find({ source: 'manual-block' }).toArray();
+        
+        // 3. Clear availability
+        await db.collection('availability').deleteMany({});
+        
+        // 4. Re-insert approved bookings
+        for (const b of approvedBookings) {
+            await db.collection('availability').updateOne(
+                { date: b.eventDate },
+                { $set: { date: b.eventDate, status: 'booked', bookingId: b._id, source: 'sync' } },
+                { upsert: true }
+            );
+        }
+        
+        // 5. Re-insert manual blocks
+        for (const m of manualBlocks) {
+            await db.collection('availability').updateOne(
+                { date: m.date },
+                { $set: { date: m.date, status: 'booked', source: 'manual-block' } },
+                { upsert: true }
+            );
+        }
+        
+        res.json({ success: true, message: 'Availability synchronized successfully.' });
+    } catch (error) { res.status(500).json({ success: false, message: 'Sync failed.' }); }
+});
+
 // SPA fallback — disable caching and ETags for index.html to force 200 OK
 app.get('*', (req, res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
