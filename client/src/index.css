@@ -62,6 +62,11 @@ button,
 .footer-link,
 .admin-tab,
 .mobile-nav-item,
+.gallery-slide,
+.nav-mobile-toggle,
+.lightbox,
+.admin-action-icon,
+.admin-btn-ghost,
 select,
 label[for] {
   cursor: pointer;
@@ -80,12 +85,8 @@ textarea {
   cursor: wait !important;
 }
 
-/* Crosshair for gallery images and precise areas */
-.gallery-item img,
-.gallery-card img,
-.service-card img {
-  cursor: crosshair;
-}
+/* Crosshair for non-clickable precision areas (none CURRENTLY identified as non-clickable precision) */
+/* .some-precision-area { cursor: crosshair; } */
 
 /* Move for draggable-style headers */
 .admin-table th,
