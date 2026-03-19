@@ -238,6 +238,20 @@ export default function AdminDashboard() {
                 </a>
             </aside>
 
+            {/* Mobile Nav Switcher — only visible on small screens */}
+            <nav className="admin-mobile-nav">
+                <button className={`admin-mobile-nav-item${tab === 'bookings' ? ' active' : ''}`} onClick={() => setTab('bookings')}>
+                    <i className="fas fa-calendar-check" /> Bookings
+                </button>
+                <button className={`admin-mobile-nav-item${tab === 'availability' ? ' active' : ''}`} onClick={() => setTab('availability')}>
+                    <i className="fas fa-calendar-alt" /> Availability
+                </button>
+                <div style={{ flex: 1 }} />
+                <button className="admin-mobile-nav-item" style={{ border: 'none' }} onClick={() => { sessionStorage.clear(); navigate('/admin') }}>
+                    <i className="fas fa-sign-out-alt" style={{ color: '#dc3545' }} />
+                </button>
+            </nav>
+
             {/* Main */}
             <main className="admin-main">
 
