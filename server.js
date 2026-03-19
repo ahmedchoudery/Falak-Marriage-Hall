@@ -225,13 +225,13 @@ app.post('/api/admin/availability', adminAuth, async (req, res) => {
     } catch (error) { res.status(500).json({ success: false, message: 'Server error.' }); }
 });
 
-// SPA fallback — disable caching for index.html
+// SPA fallback — disable caching and ETags for index.html to force 200 OK
 app.get('*', (req, res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
-    res.sendFile(path.resolve(process.cwd(), 'dist', 'index.html'));
+    res.sendFile(path.resolve(process.cwd(), 'dist', 'index.html'), { etag: false, lastModified: false });
 });
 
 if (process.env.NODE_ENV !== 'production') {
