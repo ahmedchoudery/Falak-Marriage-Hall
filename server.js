@@ -78,11 +78,7 @@ app.post('/api/booking', async (req, res) => {
             createdAt: new Date(),
         };
         const result = await db.collection('bookings').insertOne(newBooking);
-        await db.collection('availability').updateOne(
-            { date: eventDate },
-            { $set: { date: eventDate, status: 'booked', bookingId: result.insertedId } },
-            { upsert: true }
-        );
+
 
         // ── Admin Notification: Email via Resend ──
         if (resend) {
@@ -172,11 +168,14 @@ app.post('/api/admin/bookings', adminAuth, async (req, res) => {
             createdAt: new Date(),
         };
         const result = await db.collection('bookings').insertOne(booking);
-        await db.collection('availability').updateOne(
-            { date: eventDate },
-            { $set: { date: eventDate, status: 'booked', bookingId: result.insertedId } },
-            { upsert: true }
-        );
+        
+        if (booking.status === 'approved') {
+            await db.collection('availability').updateOne(
+                { date: eventDate },
+                { $set: { date: eventDate, status: 'booked', bookingId: result.insertedId, source: 'manual-booking' } },
+                { upsert: true }
+            );
+        }
         res.status(201).json({ success: true, message: 'Booking added.', bookingId: result.insertedId });
     } catch (error) { res.status(500).json({ success: false, message: 'Server error.' }); }
 });
@@ -196,21 +195,32 @@ app.put('/api/admin/bookings/:id', adminAuth, async (req, res) => {
         if (hall) updateData.hall = hall;
         if (guests !== undefined) updateData.guests = parseInt(guests) || 0;
         if (message !== undefined) updateData.message = message;
-        if (status) updateData.status = status;
+        const oldBooking = await db.collection('bookings').findOne({ _id: new ObjectId(id) });
+        if (!oldBooking) return res.status(404).json({ success: false, message: 'Booking not found.' });
+
         const result = await db.collection('bookings').updateOne(
             { _id: new ObjectId(id) }, { $set: updateData }
         );
-        if (result.matchedCount === 0)
-            return res.status(404).json({ success: false, message: 'Booking not found.' });
-        if (status === 'approved' && eventDate) {
+
+        // ── Availability Sync Logic ──
+        const currentBooking = { ...oldBooking, ...updateData };
+        
+        // 1. If date changed and old was approved, free the OLD date
+        if (oldBooking.status === 'approved' && oldBooking.eventDate !== currentBooking.eventDate) {
+            await db.collection('availability').deleteOne({ date: oldBooking.eventDate });
+        }
+
+        // 2. Sync availability based on CURRENT status
+        if (currentBooking.status === 'approved') {
             await db.collection('availability').updateOne(
-                { date: eventDate },
-                { $set: { date: eventDate, status: 'booked', bookingId: new ObjectId(id) } },
+                { date: currentBooking.eventDate },
+                { $set: { date: currentBooking.eventDate, status: 'booked', bookingId: new ObjectId(id) } },
                 { upsert: true }
             );
-        } else if (status === 'rejected') {
-            const booking = await db.collection('bookings').findOne({ _id: new ObjectId(id) });
-            if (booking?.eventDate) await db.collection('availability').deleteOne({ date: booking.eventDate });
+        } else {
+            // If NOT approved (pending/rejected/cancelled), ensure the date is FREE (unless other approved booking exists)
+            // For now, assume 1 booking per date.
+            await db.collection('availability').deleteOne({ date: currentBooking.eventDate });
         }
         res.json({ success: true, message: 'Booking updated.' });
     } catch (error) { console.error(error); res.status(500).json({ success: false, message: 'Server error.' }); }
@@ -249,7 +259,7 @@ app.post('/api/admin/availability', adminAuth, async (req, res) => {
         } else {
             await db.collection('availability').updateOne(
                 { date },
-                { $set: { date, status: 'booked', source: 'manual' } },
+                { $set: { date, status: 'booked', source: 'manual-block' } },
                 { upsert: true }
             );
         }

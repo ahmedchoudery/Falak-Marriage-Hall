@@ -399,7 +399,7 @@ export default function AdminDashboard() {
                                             <div>
                                                 <span className="admin-date-val">{d.date}</span>
                                                 <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginLeft: 10 }}>
-                                                    {d.source === 'manual' ? 'Manually blocked' : 'From booking'}
+                                                    {d.source === 'manual-block' ? 'Manually blocked' : 'Approved Booking'}
                                                 </span>
                                             </div>
                                             <button
