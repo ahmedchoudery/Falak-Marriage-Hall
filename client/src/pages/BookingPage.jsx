@@ -170,8 +170,23 @@ export default function BookingPage() {
                   Thank you, <strong style={{ color: 'var(--gold)' }}>{form.name}</strong>!
                   Our team will contact you on <strong style={{ color: 'var(--gold)' }}>{form.phone}</strong> within 24 hours to confirm your booking.
                 </p>
-                <a href="https://wa.me/923086891083" target="_blank" rel="noreferrer" className="btn btn-gold">
-                  <i className="fab fa-whatsapp" /> Chat on WhatsApp
+                {/* Dynamic WhatsApp Confirmation */}
+                <a 
+                  href={`https://wa.me/923086891083?text=${encodeURIComponent(
+                    `Hi, I just submitted a booking inquiry on your website!\n\n` +
+                    `*Name:* ${form.name}\n` +
+                    `*Date:* ${form.eventDate}\n` +
+                    `*Event:* ${form.eventType}\n` +
+                    `*Guests:* ${form.guests}\n` +
+                    `*Phone:* ${form.phone}\n` +
+                    (form.message ? `*Notes:* ${form.message}` : '')
+                  )}`} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="btn btn-gold"
+                  style={{ background: '#25d366', borderColor: '#25d366', color: 'white' }}
+                >
+                  <i className="fab fa-whatsapp" /> Confirm on WhatsApp
                 </a>
               </div>
             ) : (
