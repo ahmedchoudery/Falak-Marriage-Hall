@@ -284,7 +284,7 @@ section {
   text-transform: uppercase;
   border-radius: 2px;
   border: none;
-  cursor: none;
+  
   transition: all 0.35s var(--ease);
   position: relative;
   overflow: hidden;
@@ -424,7 +424,7 @@ section {
   text-transform: uppercase;
   border-radius: 2px;
   transition: all 0.3s var(--ease);
-  cursor: none;
+  
 }
 
 .nav-cta:hover {
@@ -437,7 +437,7 @@ section {
   display: none;
   flex-direction: column;
   gap: 5px;
-  cursor: none;
+  
   padding: 4px;
   z-index: 1001;
   background: none;
@@ -813,7 +813,7 @@ section {
   background: var(--dark-card);
   padding: clamp(36px, 4vw, 56px) 40px;
   text-align: center;
-  cursor: none;
+  
   transition: background 0.4s var(--ease);
   position: relative;
   overflow: hidden;
@@ -894,7 +894,7 @@ section {
 .gallery-slide {
   position: relative;
   overflow: hidden;
-  cursor: none;
+  
 }
 
 .gallery-slide img {
@@ -971,7 +971,7 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: none;
+  
   font-size: 1.2rem;
   transition: all 0.3s;
 }
@@ -1011,7 +1011,7 @@ section {
   padding: 48px 36px;
   position: relative;
   transition: transform 0.4s var(--ease), box-shadow 0.4s;
-  cursor: none;
+  
 }
 
 .package-card:hover {
@@ -1328,7 +1328,7 @@ section {
   border-radius: var(--radius);
   border: 1px solid transparent;
   transition: all 0.2s;
-  cursor: none;
+  
 }
 
 .cal-day.available {
@@ -1539,7 +1539,7 @@ section {
   font-size: 0.9rem;
   border-radius: 2px;
   transition: all 0.3s var(--ease);
-  cursor: none;
+  
 }
 
 .footer-social-btn:hover {
@@ -1620,7 +1620,7 @@ section {
   z-index: 900;
   box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
   transition: all 0.35s var(--ease-bounce);
-  cursor: none;
+  
 }
 
 .whatsapp-float:hover {
@@ -1683,7 +1683,7 @@ section {
   border-radius: var(--radius);
   transition: border-color 0.3s, box-shadow 0.3s;
   outline: none;
-  cursor: none;
+  
 }
 
 .form-control:focus {
@@ -2747,4 +2747,4 @@ select.admin-input option {
   .admin-modal {
     max-height: 95vh;
   }
-}
+}
