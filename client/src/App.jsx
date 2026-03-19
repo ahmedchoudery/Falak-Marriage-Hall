@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
-import Cursor from './components/Cursor'
 import Loader from './components/Loader'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -35,7 +34,7 @@ function AdminGuard() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Cursor />
+
       <Loader />
       <ScrollToTop />
       <Routes>

@@ -46,7 +46,6 @@ body {
   color: var(--text);
   overflow-x: hidden;
   line-height: 1.7;
-  cursor: none;
 }
 
 img {
@@ -61,58 +60,9 @@ a {
 
 button {
   font-family: inherit;
-  cursor: none;
 }
 
-/* ─── Custom Cursor ──────────────────────────────────── */
-.cursor-dot,
-.cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 99999;
-  will-change: transform;
-}
 
-.cursor-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--gold);
-  border-radius: 50%;
-  margin: -4px 0 0 -4px;
-  transition: width 0.25s var(--ease),
-    height 0.25s var(--ease),
-    background 0.25s,
-    opacity 0.25s;
-}
-
-.cursor-ring {
-  width: 38px;
-  height: 38px;
-  border: 1.5px solid var(--gold);
-  border-radius: 50%;
-  margin: -19px 0 0 -19px;
-  transition: width 0.35s var(--ease),
-    height 0.35s var(--ease),
-    margin 0.35s var(--ease),
-    border-color 0.3s,
-    background 0.3s;
-}
-
-.cursor-dot.hovered {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.cursor-ring.hovered {
-  width: 64px;
-  height: 64px;
-  margin: -32px 0 0 -32px;
-  border-color: var(--gold-light);
-  background: rgba(198, 167, 105, 0.08);
-}
 
 /* ─── Loader ─────────────────────────────────────────── */
 .loader-overlay {
