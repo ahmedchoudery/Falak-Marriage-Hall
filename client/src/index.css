@@ -40,6 +40,7 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ─── Functional Cursors ─── */
 body {
   font-family: var(--font-body);
   background: var(--dark);
@@ -61,18 +62,36 @@ button,
 .footer-link,
 .admin-tab,
 .mobile-nav-item,
-select {
+select,
+label[for] {
   cursor: pointer;
 }
 
-input, 
+/* I-Beam for text inputs */
+input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
 textarea {
   cursor: text;
 }
 
+/* Wait for loading states */
 .is-loading,
-.is-loading * {
+.is-loading *,
+.loading-overlay {
   cursor: wait !important;
+}
+
+/* Crosshair for gallery images and precise areas */
+.gallery-item img,
+.gallery-card img,
+.service-card img {
+  cursor: crosshair;
+}
+
+/* Move for draggable-style headers */
+.admin-table th,
+.modal-title,
+.admin-header {
+  cursor: move;
 }
 
 
