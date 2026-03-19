@@ -55,19 +55,13 @@ img {
 }
 
 a, 
-.nav-link, 
-.footer-link {
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-}
-
 button, 
-.btn, 
+.btn,
+.nav-link,
+.footer-link,
 .admin-tab,
 .mobile-nav-item,
-label {
-  font-family: inherit;
+select {
   cursor: pointer;
 }
 
@@ -76,24 +70,9 @@ textarea {
   cursor: text;
 }
 
-select {
-  cursor: pointer;
-}
-
 .is-loading,
 .is-loading * {
   cursor: wait !important;
-}
-
-.service-card,
-.gallery-item,
-.gallery-card {
-  cursor: crosshair;
-}
-
-.admin-table th,
-.modal-header {
-  cursor: move;
 }
 
 
