@@ -46,6 +46,7 @@ body {
   color: var(--text);
   overflow-x: hidden;
   line-height: 1.7;
+  cursor: default;
 }
 
 img {
@@ -53,13 +54,46 @@ img {
   display: block;
 }
 
-a {
+a, 
+.nav-link, 
+.footer-link {
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
 }
 
-button {
+button, 
+.btn, 
+.admin-tab,
+.mobile-nav-item,
+label {
   font-family: inherit;
+  cursor: pointer;
+}
+
+input, 
+textarea {
+  cursor: text;
+}
+
+select {
+  cursor: pointer;
+}
+
+.is-loading,
+.is-loading * {
+  cursor: wait !important;
+}
+
+.service-card,
+.gallery-item,
+.gallery-card {
+  cursor: crosshair;
+}
+
+.admin-table th,
+.modal-header {
+  cursor: move;
 }
 
 

@@ -298,7 +298,7 @@ export default function BookingPage() {
 
                 <button
                   type="submit"
-                  className="btn btn-gold"
+                  className={`btn btn-gold${loading ? ' is-loading' : ''}`}
                   disabled={loading}
                   style={{ width: '100%', justifyContent: 'center', fontSize: '0.85rem', padding: '16px 0', letterSpacing: '0.2em' }}
                 >

@@ -68,7 +68,7 @@ export default function AdminLogin() {
 
                     <button
                         type="submit"
-                        className="admin-btn-primary"
+                        className={`admin-btn-primary${loading ? ' is-loading' : ''}`}
                         disabled={loading}
                         style={{ width: '100%', justifyContent: 'center', marginTop: 8 }}
                     >
