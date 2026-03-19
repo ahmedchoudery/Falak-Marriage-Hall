@@ -359,6 +359,7 @@ section {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 60px;
 }
 
 .nav-logo {
@@ -367,7 +368,9 @@ section {
   font-weight: 700;
   color: var(--gold);
   letter-spacing: 0.2em;
+  word-spacing: 0.4em;
   transition: color 0.3s;
+  white-space: nowrap;
 }
 
 .nav-logo:hover {
