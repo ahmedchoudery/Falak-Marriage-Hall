@@ -70,7 +70,7 @@ export default function AvailabilityCalendar() {
   }
 
   return (
-    <section className="calendar-section">
+    <section id="availability" className="calendar-section">
       <div className="container">
         <div
           ref={headRef}

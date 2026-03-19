@@ -377,7 +377,7 @@ section {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 50px;
   list-style: none;
 }
 
@@ -414,23 +414,25 @@ section {
 }
 
 .nav-cta {
-  background: transparent;
-  border: 1px solid var(--gold-border);
-  color: var(--gold);
-  padding: 10px 24px;
-  font-size: 0.7rem;
-  font-weight: 600;
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  color: var(--dark);
+  padding: 12px 28px;
+  font-size: 0.72rem;
+  font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  border-radius: 2px;
+  border-radius: 4px;
+  box-shadow: 0 4px 15px rgba(198, 167, 105, 0.2);
   transition: all 0.3s var(--ease);
-  
-}
+}  
 
 .nav-cta:hover {
-  background: var(--gold);
+  background: var(--gold-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(198, 167, 105, 0.3);
   color: var(--dark);
-  border-color: var(--gold);
+  border-color: var(--gold-light);
 }
 
 .nav-hamburger {

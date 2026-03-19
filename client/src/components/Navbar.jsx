@@ -7,7 +7,7 @@ const links = [
   { to: '/#services', label: 'Services' },
   { to: '/#gallery', label: 'Gallery' },
   { to: '/#packages', label: 'Packages' },
-  { to: '/booking', label: 'Booking', page: true },
+  { to: '/#availability', label: 'Calendar' },
   { to: '/contact', label: 'Contact', page: true },
 ]
 
