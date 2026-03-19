@@ -76,6 +76,22 @@ export default function BookingPage() {
 
       if (res.ok && data.success) {
         setSubmitted(true)
+        
+        // Construct WhatsApp message
+        const waMsg = encodeURIComponent(
+          `Hi, I just submitted a booking inquiry on your website!\n\n` +
+          `*Name:* ${form.name}\n` +
+          `*Date:* ${form.eventDate}\n` +
+          `*Event:* ${form.eventType}\n` +
+          `*Guests:* ${form.guests}\n` +
+          `*Phone:* ${form.phone}\n` +
+          (form.message ? `*Notes:* ${form.message}` : '')
+        );
+        const waUrl = `https://wa.me/923086891083?text=${waMsg}`;
+        
+        // Automatically trigger WhatsApp in a new tab
+        window.open(waUrl, '_blank');
+
         // Animate success icon
         setTimeout(() => {
           anime({
@@ -164,11 +180,10 @@ export default function BookingPage() {
                   <i className="fas fa-check" />
                 </div>
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', color: 'var(--cream)', marginBottom: 12 }}>
-                  Inquiry Received!
+                  Booking Inquiry Submitted!
                 </h3>
                 <p style={{ color: 'var(--text-muted)', marginBottom: 32, fontSize: '0.95rem' }}>
-                  Thank you, <strong style={{ color: 'var(--gold)' }}>{form.name}</strong>!
-                  Our team will contact you on <strong style={{ color: 'var(--gold)' }}>{form.phone}</strong> within 24 hours to confirm your booking.
+                  We'll contact you any minute now on <strong style={{ color: 'var(--gold)' }}>{form.phone}</strong> to confirm your details.
                 </p>
                 {/* Dynamic WhatsApp Confirmation */}
                 <a 
@@ -295,7 +310,7 @@ export default function BookingPage() {
                 </button>
 
                 <p style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 16 }}>
-                  We'll confirm within 24 hours. For urgent booking, call{' '}
+                  We'll call you on your given Contact. We'll confirm within 24 hours. For urgent booking, call{' '}
                   <a href="tel:+923086891083" style={{ color: 'var(--gold)' }}>0308-6891083</a>
                 </p>
               </form>
