@@ -28,7 +28,8 @@ app.get('/assets/:file', (req, res, next) => {
         res.sendFile(filePath);
     } else { next(); }
 });
-app.use(express.static(path.resolve(process.cwd(), 'dist')));
+// Static assets — disable default index serving to prevent cache interception
+app.use(express.static(path.resolve(process.cwd(), 'dist'), { index: false }));
 
 // MongoDB
 let cachedDb = null;
