@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="8" fill="#0F2A24"/>
+  <!-- Arch -->
+  <path d="M16,54 L16,30 Q16,9 32,5 Q48,9 48,30 L48,54"
+    fill="none" stroke="#C6A769" stroke-width="3.5" stroke-linecap="square"/>
+  <!-- Inner accent -->
+  <path d="M19,54 L19,32 Q19,14 32,11 Q45,14 45,32 L45,54"
+    fill="none" stroke="#C6A769" stroke-width="1" stroke-linecap="square" opacity="0.25"/>
+  <!-- Spring dots -->
+  <circle cx="16" cy="30" r="2.2" fill="#C6A769"/>
+  <circle cx="48" cy="30" r="2.2" fill="#C6A769"/>
+  <!-- Base bar -->
+  <rect x="10" y="54" width="44" height="2.5" fill="#C6A769"/>
+  <polygon points="10,53 13,55.5 10,58 7,55.5" fill="#C6A769"/>
+  <polygon points="54,53 57,55.5 54,58 51,55.5" fill="#C6A769"/>
+  <!-- Crescent -->
+  <circle cx="32" cy="7" r="6.5" fill="#C6A769"/>
+  <circle cx="34.8" cy="5.5" r="5" fill="#0F2A24"/>
+  <!-- Star dot -->
+  <circle cx="42.5" cy="6" r="2" fill="#C6A769"/>
+  <!-- Wedding rings -->
+  <circle cx="26" cy="38" r="9" stroke="#C6A769" stroke-width="2.5" fill="none"/>
+  <circle cx="38" cy="38" r="9" stroke="#C6A769" stroke-width="2.5" fill="none"/>
+</svg>

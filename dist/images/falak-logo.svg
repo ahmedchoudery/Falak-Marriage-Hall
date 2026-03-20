@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 680 430">
+
+  <!-- Card -->
+  <rect x="40" y="15" width="600" height="400" rx="14" fill="#0B1E19"/>
+  <rect x="54" y="29" width="572" height="372" rx="9" fill="none" stroke="#C6A769" stroke-width="0.5" opacity="0.22"/>
+
+  <!-- Arch outer -->
+  <path d="M272,230 L272,148 Q272,65 340,48 Q408,65 408,148 L408,230"
+    fill="none" stroke="#C6A769" stroke-width="11" stroke-linecap="square"/>
+  <!-- Arch inner accent -->
+  <path d="M283,230 L283,153 Q283,80 340,64 Q397,80 397,153 L397,230"
+    fill="none" stroke="#C6A769" stroke-width="1.5" stroke-linecap="square" opacity="0.22"/>
+  <!-- Spring point ornaments -->
+  <circle cx="272" cy="148" r="5.5" fill="#C6A769"/>
+  <circle cx="408" cy="148" r="5.5" fill="#C6A769"/>
+
+  <!-- Base bar -->
+  <rect x="244" y="230" width="192" height="5" fill="#C6A769"/>
+  <polygon points="244,224 250,230 244,236 238,230" fill="#C6A769"/>
+  <polygon points="436,224 442,230 436,236 430,230" fill="#C6A769"/>
+  <polygon points="340,227 343,230 340,233 337,230" fill="#C6A769"/>
+
+  <!-- Crescent moon -->
+  <circle cx="340" cy="52" r="18" fill="#C6A769"/>
+  <circle cx="350" cy="47" r="14" fill="#0B1E19"/>
+
+  <!-- Five-point star -->
+  <polygon points="370,40 371.8,44.6 376.7,44.8 372.9,47.9 374.1,52.7 370,50 365.9,52.7 367.2,47.9 363.3,44.8 368.2,44.6" fill="#C6A769"/>
+
+  <!-- Wedding rings -->
+  <circle cx="321" cy="183" r="25" stroke="#C6A769" stroke-width="6" fill="none"/>
+  <circle cx="359" cy="183" r="25" stroke="#C6A769" stroke-width="6" fill="none"/>
+
+  <!-- FALAK wordmark -->
+  <text x="340" y="293" text-anchor="middle"
+    font-family="Georgia, 'Book Antiqua', Palatino, serif"
+    font-size="58" font-weight="700" font-style="italic"
+    fill="#C6A769" letter-spacing="4">FALAK</text>
+
+  <!-- Divider -->
+  <line x1="220" y1="315" x2="323" y2="315" stroke="#C6A769" stroke-width="0.8"/>
+  <polygon points="340,311 345,315 340,319 335,315" fill="#C6A769"/>
+  <line x1="357" y1="315" x2="460" y2="315" stroke="#C6A769" stroke-width="0.8"/>
+
+  <!-- HALL & EVENTS -->
+  <text x="340" y="344" text-anchor="middle"
+    font-family="Georgia, serif" font-size="14" font-weight="400"
+    fill="#C6A769" letter-spacing="8">HALL &amp; EVENTS</text>
+
+  <!-- Tagline -->
+  <text x="340" y="372" text-anchor="middle"
+    font-family="Georgia, serif" font-size="10"
+    fill="#C6A769" opacity="0.38" letter-spacing="5">GUJRAT  ·  PAKISTAN</text>
+
+  <!-- Bottom ornament -->
+  <line x1="220" y1="397" x2="460" y2="397" stroke="#C6A769" stroke-width="0.5" opacity="0.2"/>
+  <circle cx="340" cy="397" r="2" fill="#C6A769" opacity="0.25"/>
+  <circle cx="316" cy="397" r="1.5" fill="#C6A769" opacity="0.18"/>
+  <circle cx="364" cy="397" r="1.5" fill="#C6A769" opacity="0.18"/>
+
+</svg>
