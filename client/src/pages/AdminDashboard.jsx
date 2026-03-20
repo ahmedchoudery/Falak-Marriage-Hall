@@ -40,12 +40,86 @@ const BLANK_FORM = {
 const EVENT_TYPES = ['Wedding (Nikah)', 'Walima / Reception', 'Mehndi Night', 'Birthday Party', 'Corporate Event', 'Other']
 const HALLS = ['Main Grand Hall', 'Garden Terrace', 'Any Available']
 
+const VENDOR_ROLES = ['Caterer', 'Decorator', 'Photographer', 'Videographer', 'DJ / Sound', 'Lighting', 'Valet', 'Coordinator']
+const INVENTORY_DEFAULTS = [
+    { id: 'chairs', name: 'Chairs', total: 600, icon: 'fas fa-chair' },
+    { id: 'tables', name: 'Round Tables', total: 60, icon: 'fas fa-table' },
+    { id: 'tablecloths', name: 'Table Cloths', total: 80, icon: 'fas fa-scroll' },
+    { id: 'crockery', name: 'Crockery Sets', total: 700, icon: 'fas fa-utensils' },
+    { id: 'glass', name: 'Glassware Sets', total: 500, icon: 'fas fa-wine-glass-alt' },
+    { id: 'lights', name: 'Light Fixtures', total: 200, icon: 'fas fa-lightbulb' },
+    { id: 'speakers', name: 'Speakers', total: 12, icon: 'fas fa-volume-up' },
+    { id: 'stage', name: 'Stage Panels', total: 24, icon: 'fas fa-border-all' },
+    { id: 'ac', name: 'AC Units', total: 16, icon: 'fas fa-snowflake' },
+    { id: 'generators', name: 'Generators', total: 3, icon: 'fas fa-bolt' },
+]
+
+// ── PDF Invoice Generator (opens print dialog) ─────────────────────────────
+function generateInvoice(booking) {
+    const invoiceDate = new Date().toLocaleDateString('en-PK', { year: 'numeric', month: 'long', day: 'numeric' })
+    const invoiceNo = `FH-${Date.now().toString(36).toUpperCase()}`
+    const win = window.open('', '_blank', 'width=800,height=900')
+    win.document.write(`
+<!DOCTYPE html>
+<html><head><title>Invoice ${invoiceNo}</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background:#fff; color:#222; padding:40px; }
+  .inv-header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #C6A769; padding-bottom:20px; margin-bottom:30px; }
+  .inv-logo { font-size:28px; font-weight:700; color:#0A1A15; }
+  .inv-logo small { display:block; font-size:11px; color:#888; font-weight:400; letter-spacing:2px; text-transform:uppercase; }
+  .inv-info { text-align:right; font-size:13px; color:#555; }
+  .inv-info strong { color:#222; }
+  .inv-title { font-size:18px; font-weight:700; color:#C6A769; text-transform:uppercase; letter-spacing:3px; margin-bottom:24px; }
+  .inv-table { width:100%; border-collapse:collapse; margin-bottom:24px; }
+  .inv-table th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#888; padding:8px 12px; border-bottom:1px solid #ddd; }
+  .inv-table td { padding:10px 12px; border-bottom:1px solid #eee; font-size:14px; }
+  .inv-footer { margin-top:40px; padding-top:20px; border-top:2px solid #C6A769; text-align:center; font-size:12px; color:#888; }
+  .inv-footer strong { color:#C6A769; }
+  .inv-note { background:#f9f6f0; border-left:4px solid #C6A769; padding:16px; margin:24px 0; font-size:13px; color:#555; }
+  @media print { body { padding:20px; } }
+</style></head><body>
+  <div class="inv-header">
+    <div class="inv-logo">FALAK HALL<small>Marriage Hall & Events</small></div>
+    <div class="inv-info">
+      <div><strong>Invoice #:</strong> ${invoiceNo}</div>
+      <div><strong>Date:</strong> ${invoiceDate}</div>
+      <div><strong>Status:</strong> ${booking.status.toUpperCase()}</div>
+    </div>
+  </div>
+  <div class="inv-title">Booking Invoice</div>
+  <table class="inv-table">
+    <thead><tr><th>Detail</th><th>Information</th></tr></thead>
+    <tbody>
+      <tr><td>Client Name</td><td><strong>${booking.name}</strong></td></tr>
+      <tr><td>Phone</td><td>${booking.phone}</td></tr>
+      ${booking.email ? `<tr><td>Email</td><td>${booking.email}</td></tr>` : ''}
+      <tr><td>Event Date</td><td><strong>${booking.eventDate}</strong></td></tr>
+      <tr><td>Event Type</td><td>${booking.eventType}</td></tr>
+      <tr><td>Hall</td><td>${booking.hall || 'Any Available'}</td></tr>
+      <tr><td>Estimated Guests</td><td>${booking.guests || 'N/A'}</td></tr>
+      ${booking.message ? `<tr><td>Special Requirements</td><td>${booking.message}</td></tr>` : ''}
+    </tbody>
+  </table>
+  <div class="inv-note">
+    <strong>Note:</strong> Final pricing will be confirmed during consultation. Use our online Menu Builder at falak-marriage-hall.vercel.app for instant estimates.
+  </div>
+  <div class="inv-footer">
+    <strong>Falak Marriage Hall</strong> — GT Road, Service Mor, Gujrat 50700, Punjab<br/>
+    Phone: 0308-6891083 | Email: info@falakhall.com<br/><br/>
+    Thank you for choosing Falak Hall & Events!
+  </div>
+</body></html>`)
+    win.document.close()
+    setTimeout(() => win.print(), 300)
+}
+
 // ── main component ─────────────────────────────────────────────────────────
 export default function AdminDashboard() {
     const navigate = useNavigate()
     const token = sessionStorage.getItem('adminToken')
 
-    const [tab, setTab] = useState('bookings')   // bookings | availability
+    const [tab, setTab] = useState('bookings')   // bookings | availability | vendors | inventory
     const [filter, setFilter] = useState('all')
     const [bookings, setBookings] = useState([])
     const [availability, setAvailability] = useState([])
@@ -60,6 +134,31 @@ export default function AdminDashboard() {
 
     // Availability block date
     const [blockDate, setBlockDate] = useState('')
+
+    // Vendors (localStorage)
+    const [vendors, setVendors] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('falak_vendors')) || [] } catch { return [] }
+    })
+    const [vendorForm, setVendorForm] = useState({ name: '', role: '', phone: '', note: '' })
+
+    const saveVendors = (v) => { setVendors(v); localStorage.setItem('falak_vendors', JSON.stringify(v)) }
+    const addVendor = () => {
+        if (!vendorForm.name.trim() || !vendorForm.role) return showToast('Name and role required.', 'error')
+        saveVendors([...vendors, { ...vendorForm, id: Date.now().toString(36) }])
+        setVendorForm({ name: '', role: '', phone: '', note: '' })
+        showToast('Vendor added!')
+    }
+    const deleteVendor = (id) => { saveVendors(vendors.filter(v => v.id !== id)); showToast('Vendor removed.') }
+
+    // Inventory (localStorage)
+    const [inventory, setInventory] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('falak_inventory')) || INVENTORY_DEFAULTS } catch { return INVENTORY_DEFAULTS }
+    })
+
+    const saveInventory = (inv) => { setInventory(inv); localStorage.setItem('falak_inventory', JSON.stringify(inv)) }
+    const updateInventoryItem = (id, field, value) => {
+        saveInventory(inventory.map(item => item.id === id ? { ...item, [field]: Number(value) || 0 } : item))
+    }
 
     // ── auth guard ─────────────────────────────────────────────────────────
     useEffect(() => {
@@ -220,6 +319,12 @@ export default function AdminDashboard() {
                     <button className={`admin-nav-item${tab === 'availability' ? ' active' : ''}`} onClick={() => setTab('availability')}>
                         <i className="fas fa-calendar-alt" /> Availability
                     </button>
+                    <button className={`admin-nav-item${tab === 'vendors' ? ' active' : ''}`} onClick={() => setTab('vendors')}>
+                        <i className="fas fa-users" /> Vendors
+                    </button>
+                    <button className={`admin-nav-item${tab === 'inventory' ? ' active' : ''}`} onClick={() => setTab('inventory')}>
+                        <i className="fas fa-boxes" /> Inventory
+                    </button>
                 </nav>
 
                 <div className="admin-sidebar-stats">
@@ -241,12 +346,17 @@ export default function AdminDashboard() {
             {/* Mobile Nav Switcher — only visible on small screens */}
             <nav className="admin-mobile-nav">
                 <button className={`admin-mobile-nav-item${tab === 'bookings' ? ' active' : ''}`} onClick={() => setTab('bookings')}>
-                    <i className="fas fa-calendar-check" /> Bookings
+                    <i className="fas fa-calendar-check" />
                 </button>
                 <button className={`admin-mobile-nav-item${tab === 'availability' ? ' active' : ''}`} onClick={() => setTab('availability')}>
-                    <i className="fas fa-calendar-alt" /> Availability
+                    <i className="fas fa-calendar-alt" />
                 </button>
-                <div style={{ flex: 1 }} />
+                <button className={`admin-mobile-nav-item${tab === 'vendors' ? ' active' : ''}`} onClick={() => setTab('vendors')}>
+                    <i className="fas fa-users" />
+                </button>
+                <button className={`admin-mobile-nav-item${tab === 'inventory' ? ' active' : ''}`} onClick={() => setTab('inventory')}>
+                    <i className="fas fa-boxes" />
+                </button>
                 <button className="admin-mobile-nav-item" style={{ border: 'none' }} onClick={() => { sessionStorage.clear(); navigate('/admin') }}>
                     <i className="fas fa-sign-out-alt" style={{ color: '#dc3545' }} />
                 </button>
@@ -344,6 +454,9 @@ export default function AdminDashboard() {
                                                         <button className="admin-action-btn edit" title="Edit" onClick={() => openEdit(b)}>
                                                             <i className="fas fa-edit" />
                                                         </button>
+                                                        <button className="admin-action-btn" title="Invoice" style={{ color: '#C6A769' }} onClick={() => generateInvoice(b)}>
+                                                            <i className="fas fa-file-invoice" />
+                                                        </button>
                                                         <button className="admin-action-btn delete" title="Delete" onClick={() => deleteBooking(b._id)}>
                                                             <i className="fas fa-trash" />
                                                         </button>
@@ -428,6 +541,133 @@ export default function AdminDashboard() {
                                     ))}
                                 </div>
                             )}
+                        </div>
+                    </>
+                )}
+
+                {/* ── VENDORS TAB ── */}
+                {tab === 'vendors' && (
+                    <>
+                        <div className="admin-header">
+                            <div>
+                                <h1 className="admin-page-title">Vendor Management</h1>
+                                <p className="admin-page-sub">Manage catering staff, decorators, and event partners</p>
+                            </div>
+                        </div>
+
+                        <div className="admin-card" style={{ marginBottom: 32 }}>
+                            <h3 className="admin-card-title">Add Vendor / Staff</h3>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
+                                <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                    <label>Name *</label>
+                                    <input className="admin-input" placeholder="Vendor name" value={vendorForm.name} onChange={e => setVendorForm(f => ({ ...f, name: e.target.value }))} />
+                                </div>
+                                <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                    <label>Role *</label>
+                                    <select className="admin-input" value={vendorForm.role} onChange={e => setVendorForm(f => ({ ...f, role: e.target.value }))}>
+                                        <option value="">Select role…</option>
+                                        {VENDOR_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                                    </select>
+                                </div>
+                                <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                    <label>Phone</label>
+                                    <input className="admin-input" placeholder="03xx-xxxxxxx" value={vendorForm.phone} onChange={e => setVendorForm(f => ({ ...f, phone: e.target.value }))} />
+                                </div>
+                                <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                    <label>Note</label>
+                                    <input className="admin-input" placeholder="Optional note" value={vendorForm.note} onChange={e => setVendorForm(f => ({ ...f, note: e.target.value }))} />
+                                </div>
+                            </div>
+                            <button className="admin-btn-primary" style={{ marginTop: 16 }} onClick={addVendor}>
+                                <i className="fas fa-plus" /> Add Vendor
+                            </button>
+                        </div>
+
+                        <div className="admin-card">
+                            <h3 className="admin-card-title">{vendors.length} Registered Vendors</h3>
+                            {vendors.length === 0 ? (
+                                <div className="admin-empty" style={{ padding: '40px 0' }}>
+                                    <i className="fas fa-users" />
+                                    <p>No vendors registered yet</p>
+                                </div>
+                            ) : (
+                                <div className="admin-table-wrap">
+                                    <table className="admin-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Role</th>
+                                                <th>Phone</th>
+                                                <th>Note</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {vendors.map(v => (
+                                                <tr key={v.id}>
+                                                    <td><strong>{v.name}</strong></td>
+                                                    <td><span style={{ background: 'rgba(198,167,105,0.15)', color: '#C6A769', padding: '2px 10px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 600 }}>{v.role}</span></td>
+                                                    <td>{v.phone || '—'}</td>
+                                                    <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{v.note || '—'}</td>
+                                                    <td>
+                                                        <button className="admin-action-btn delete" title="Remove" onClick={() => deleteVendor(v.id)}>
+                                                            <i className="fas fa-trash" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
+
+                {/* ── INVENTORY TAB ── */}
+                {tab === 'inventory' && (
+                    <>
+                        <div className="admin-header">
+                            <div>
+                                <h1 className="admin-page-title">Inventory Tracker</h1>
+                                <p className="admin-page-sub">Track hall assets — chairs, lighting, sound equipment, and more</p>
+                            </div>
+                            <button className="admin-btn-ghost" onClick={() => { saveInventory(INVENTORY_DEFAULTS); showToast('Inventory reset to defaults.') }}>
+                                <i className="fas fa-undo" /> Reset Defaults
+                            </button>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+                            {inventory.map(item => {
+                                const usagePercent = item.total > 0 ? Math.round(((item.inUse || 0) / item.total) * 100) : 0
+                                const barColor = usagePercent > 80 ? '#dc3545' : usagePercent > 50 ? '#ffc107' : '#28a745'
+                                return (
+                                    <div key={item.id} className="admin-card" style={{ padding: 20 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                                            <div style={{ width: 40, height: 40, background: 'rgba(198,167,105,0.12)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C6A769', fontSize: '1rem' }}>
+                                                <i className={item.icon} />
+                                            </div>
+                                            <div>
+                                                <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{item.name}</div>
+                                                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{item.inUse || 0} / {item.total} in use</div>
+                                            </div>
+                                        </div>
+                                        <div style={{ height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 3, overflow: 'hidden', marginBottom: 12 }}>
+                                            <div style={{ height: '100%', width: `${usagePercent}%`, background: barColor, borderRadius: 3, transition: 'width 0.4s' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', gap: 8 }}>
+                                            <div className="admin-form-group" style={{ marginBottom: 0, flex: 1 }}>
+                                                <label style={{ fontSize: '0.65rem' }}>Total</label>
+                                                <input className="admin-input" type="number" min="0" value={item.total} onChange={e => updateInventoryItem(item.id, 'total', e.target.value)} style={{ padding: '6px 8px', fontSize: '0.82rem' }} />
+                                            </div>
+                                            <div className="admin-form-group" style={{ marginBottom: 0, flex: 1 }}>
+                                                <label style={{ fontSize: '0.65rem' }}>In Use</label>
+                                                <input className="admin-input" type="number" min="0" max={item.total} value={item.inUse || 0} onChange={e => updateInventoryItem(item.id, 'inUse', e.target.value)} style={{ padding: '6px 8px', fontSize: '0.82rem' }} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </div>
                     </>
                 )}
