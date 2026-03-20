@@ -5,6 +5,7 @@ import Services from '../components/Services'
 import Gallery from '../components/Gallery'
 import ParallaxBanner from '../components/ParallaxBanner'
 import Packages from '../components/Packages'
+import MenuBuilder from '../components/MenuBuilder'
 import Testimonials from '../components/Testimonials'
 import Timeline from '../components/Timeline'
 import AvailabilityCalendar from '../components/AvailabilityCalendar'
@@ -21,6 +22,7 @@ export default function Home() {
       <Gallery />
       <ParallaxBanner image="/images/gallery_3.png" />
       <Packages />
+      <MenuBuilder />
       <Timeline />
       <Testimonials />
       <AvailabilityCalendar />
