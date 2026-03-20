@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Resend } from 'resend';
+import twilio from 'twilio';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
@@ -14,6 +15,29 @@ const __dirname = path.dirname(__filename);
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'ahmedchoudery30@gmail.com';
+
+// ── Twilio SMS Client ──
+const twilioClient = (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN)
+    ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+    : null;
+const TWILIO_FROM = process.env.TWILIO_PHONE_NUMBER || '';
+
+async function sendSMS(to, message) {
+    if (!twilioClient || !TWILIO_FROM) {
+        console.log('[SMS] Twilio not configured. Skipping SMS to', to);
+        return;
+    }
+    // Normalize Pakistani phone numbers
+    let phone = to.replace(/[\s-]/g, '');
+    if (phone.startsWith('03')) phone = '+92' + phone.slice(1);
+    if (!phone.startsWith('+')) phone = '+' + phone;
+    try {
+        await twilioClient.messages.create({ body: message, from: TWILIO_FROM, to: phone });
+        console.log(`[SMS] Sent to ${phone}`);
+    } catch (err) {
+        console.error('[SMS] Failed:', err.message);
+    }
+}
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -240,6 +264,20 @@ app.put('/api/admin/bookings/:id', adminAuth, async (req, res) => {
             // For now, assume 1 booking per date.
             await db.collection('availability').deleteOne({ date: currentBooking.eventDate });
         }
+
+        // ── SMS Notification on status change ──
+        if (status && status !== oldBooking.status && currentBooking.phone) {
+            if (status === 'approved') {
+                sendSMS(currentBooking.phone,
+                    `Assalam-o-Alaikum ${currentBooking.name},\n\nYour booking at Falak Marriage Hall has been APPROVED!\n\nEvent: ${currentBooking.eventType}\nDate: ${currentBooking.eventDate}\nHall: ${currentBooking.hall || 'Any Available'}\n\nWe look forward to making your event unforgettable! Contact us at 0308-6891083 for any questions.\n\n— Falak Hall & Events`
+                );
+            } else if (status === 'rejected') {
+                sendSMS(currentBooking.phone,
+                    `Dear ${currentBooking.name},\n\nWe regret to inform you that your booking request for ${currentBooking.eventDate} at Falak Marriage Hall could not be accommodated.\n\nPlease contact us at 0308-6891083 to discuss alternative dates.\n\n— Falak Hall & Events`
+                );
+            }
+        }
+
         res.json({ success: true, message: 'Booking updated.' });
     } catch (error) { console.error(error); res.status(500).json({ success: false, message: 'Server error.' }); }
 });
