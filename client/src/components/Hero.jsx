@@ -90,12 +90,18 @@ export default function Hero() {
     const tl = anime.timeline({ easing: 'easeOutExpo' })
 
     tl.add({
+      targets: '.hero-ornament',
+      opacity: [0, 1],
+      scale: [0.5, 1],
+      rotate: [15, 0],
+      duration: 1000,
+      delay: 200,
+    }).add({
       targets: '.hero-label',
       opacity: [0, 1],
       translateY: [20, 0],
       duration: 700,
-      delay: 400,
-    }).add({
+    }, '-=400').add({
       targets: '.hero-title .char',
       opacity:    [0, 1],
       translateY: [70, 0],
@@ -137,6 +143,9 @@ export default function Hero() {
       <canvas ref={canvasRef} className="hero-canvas" />
 
       <div className="hero-content">
+        <div className="hero-ornament">
+          <i className="fas fa-dove" />
+        </div>
         <span className="hero-label">Gujrat's Most Premium Wedding Venue</span>
         <h1 className="hero-title">{chars}</h1>
         <p className="hero-subtitle">Where Beautiful Wedding Memories Begin</p>

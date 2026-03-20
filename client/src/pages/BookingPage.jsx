@@ -137,14 +137,17 @@ export default function BookingPage() {
     <div className="booking-page">
       {/* Hero Header */}
       <div
+        className="booking-hero"
         style={{
-          padding: '80px 0 60px',
+          padding: '100px 0 80px',
           textAlign: 'center',
-          background: 'linear-gradient(to bottom, var(--dark-3), var(--dark-2))',
+          position: 'relative',
+          overflow: 'hidden',
           borderBottom: '1px solid var(--gold-border)',
         }}
       >
-        <div className="container">
+        <div className="booking-hero-pattern" />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <span className="section-label" style={{ display: 'block', textAlign: 'center' }}>
             Reserve Your Date
           </span>
@@ -305,7 +308,7 @@ export default function BookingPage() {
                   {loading ? (
                     <><i className="fas fa-circle-notch fa-spin" /> Submitting…</>
                   ) : (
-                    <><i className="fas fa-paper-plane" /> Submit Booking Inquiry</>
+                    <><i className="fas fa-lock" style={{ fontSize: '0.7rem', opacity: 0.7 }} /> Secure Booking Inquiry</>
                   )}
                 </button>
 
@@ -322,6 +325,10 @@ export default function BookingPage() {
             ref={infoRef}
             className={`booking-info reveal-right${infoVisible ? ' visible' : ''}`}
           >
+            <div className="booking-trust-seal">
+              <i className="fas fa-shield-halved" />
+              <span>Certified Royal Venue</span>
+            </div>
             <div className="booking-info-card">
               <h3>Premium Experience</h3>
               <div className="info-feature">

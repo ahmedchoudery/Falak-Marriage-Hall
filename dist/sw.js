@@ -1,6 +1,6 @@
 /* Falak Hall — Service Worker (Cache-First for assets, Network-First for API) */
 
-const CACHE_NAME = 'falak-hall-v3';
+const CACHE_NAME = 'falak-hall-v4';
 const STATIC_ASSETS = [
   '/',
   '/favicon_new.png',

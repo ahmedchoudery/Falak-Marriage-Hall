@@ -35,6 +35,7 @@ export default function About() {
               className="about-img-secondary"
             />
             <div className="about-badge">
+              <div className="about-badge-ring" />
               <span className="about-badge-num">10+</span>
               <span className="about-badge-text">Years<br/>of Excellence</span>
             </div>
