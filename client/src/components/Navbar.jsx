@@ -10,6 +10,7 @@ const links = [
   { to: '/#menu-builder', label: 'Menu' },
   { to: '/#availability', label: 'Calendar' },
   { to: '/contact', label: 'Contact', page: true },
+  { to: '/blog', label: 'Blog', page: true },
 ]
 
 export default function Navbar() {

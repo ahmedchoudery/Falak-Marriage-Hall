@@ -8,6 +8,7 @@ import BookingPage from './pages/BookingPage'
 import ContactPage from './pages/ContactPage'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+import Blog from './pages/Blog'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -41,6 +42,7 @@ export default function App() {
         {/* Public routes */}
         <Route path="/" element={<Layout><Home /></Layout>} />
         <Route path="/booking" element={<Layout><BookingPage /></Layout>} />
+        <Route path="/blog" element={<Layout><Blog /></Layout>} />
         <Route path="/contact" element={<Layout><ContactPage /></Layout>} />
 
         {/* Admin routes — no Navbar/Footer */}
