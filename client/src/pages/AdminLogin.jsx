@@ -35,7 +35,7 @@ export default function AdminLogin() {
     return (
         <div className="admin-login-wrap">
             <div className="admin-login-card">
-                <img src="/images/falak-logo.svg" alt="Falak Hall" className="admin-login-logo" />
+                <div className="admin-login-logo">FALAK HALL</div>
                 <div className="admin-login-sub">Admin Dashboard</div>
 
                 <form onSubmit={handleLogin}>

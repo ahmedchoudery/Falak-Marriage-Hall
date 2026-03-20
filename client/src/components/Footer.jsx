@@ -10,9 +10,7 @@ export default function Footer() {
 
           {/* Brand */}
           <div>
-            <Link to="/" className="footer-brand-logo">
-              <img src="/images/falak-logo.svg" alt="Falak Hall" />
-            </Link>
+            <Link to="/" className="footer-brand-logo">FALAK HALL</Link>
             <p className="footer-brand-desc">
               The premier wedding venue in Gujrat, dedicated to providing luxury, elegance,
               and unforgettable memories for your most precious day.

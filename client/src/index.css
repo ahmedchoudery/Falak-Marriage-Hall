@@ -121,9 +121,12 @@ textarea {
 }
 
 .loader-logo {
-  height: clamp(60px, 8vw, 85px);
-  width: auto;
-  margin-bottom: 40px;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.35em;
+  margin-bottom: 50px;
   opacity: 0;
 }
 
@@ -367,19 +370,18 @@ section {
 .nav-logo {
   flex-shrink: 0;
   margin-right: auto; /* Push links and CTA away from the logo if needed */
-  display: flex;
-  align-items: center;
-  transition: opacity 0.3s;
-}
-
-.nav-logo img {
-  height: clamp(38px, 4.5vw, 48px);
-  width: auto;
-  display: block;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  word-spacing: 0.4em;
+  transition: color 0.3s;
+  white-space: nowrap;
 }
 
 .nav-logo:hover {
-  opacity: 0.8;
+  color: var(--gold-light);
 }
 
 .nav-links {
@@ -1524,19 +1526,13 @@ a.contact-item-value:hover {
 }
 
 .footer-brand-logo {
-  display: inline-block;
-  margin-bottom: 20px;
-  transition: opacity 0.3s;
-}
-
-.footer-brand-logo img {
-  height: 55px;
-  width: auto;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.2em;
   display: block;
-}
-
-.footer-brand-logo:hover {
-  opacity: 0.8;
+  margin-bottom: 16px;
 }
 
 .footer-brand-desc {
@@ -2011,10 +2007,13 @@ select.form-control option {
 }
 
 .admin-login-logo {
-  height: 60px;
-  width: auto;
-  margin: 0 auto 12px auto;
-  display: block;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  text-align: center;
+  margin-bottom: 4px;
 }
 
 .admin-login-sub {
@@ -2056,10 +2055,12 @@ select.form-control option {
 }
 
 .admin-sidebar-logo {
-  height: 48px;
-  width: auto;
-  margin-bottom: 16px;
-  display: block;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  margin-bottom: 4px;
 }
 
 .admin-sidebar-sub {

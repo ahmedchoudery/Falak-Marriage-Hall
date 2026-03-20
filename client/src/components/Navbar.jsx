@@ -54,9 +54,7 @@ export default function Navbar() {
 
       <nav className={`navbar${scrolled || pathname !== '/' ? ' scrolled' : ''}`}>
         <div className="container nav-inner">
-          <Link to="/" className="nav-logo">
-            <img src="/images/falak-logo.svg" alt="Falak Hall" />
-          </Link>
+          <Link to="/" className="nav-logo">FALAK HALL</Link>
 
           {/* Desktop links */}
           <ul className="nav-links">

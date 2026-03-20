@@ -210,7 +210,7 @@ export default function AdminDashboard() {
 
             {/* Sidebar */}
             <aside className="admin-sidebar">
-                <img src="/images/falak-logo.svg" alt="Falak Hall" className="admin-sidebar-logo" />
+                <div className="admin-sidebar-logo">FALAK HALL</div>
                 <div className="admin-sidebar-sub">Admin Dashboard</div>
 
                 <nav className="admin-nav">
