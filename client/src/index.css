@@ -1785,7 +1785,48 @@ select.form-control option {
   transition: width 0.1s linear;
 }
 
-/* sticky-cta bar removed — element no longer in Navbar.jsx */
+/* ─── Sticky Bar ─────────────────────────────────────── */
+.sticky-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--gold);
+  display: flex;
+  z-index: 800;
+  transform: translateY(100%);
+  transition: transform 0.4s var(--ease);
+}
+
+.sticky-cta.visible {
+  transform: translateY(0);
+}
+
+.sticky-cta-btn {
+  flex: 1;
+  padding: 14px;
+  color: var(--dark);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-right: 1px solid rgba(6, 14, 12, 0.15);
+  transition: background 0.3s;
+}
+
+.sticky-cta-btn:last-child {
+  background: #25d366;
+  color: white;
+  border: none;
+}
+
+.sticky-cta-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
 
 /* ─── Responsive ─────────────────────────────────────── */
 @media (max-width: 1024px) {

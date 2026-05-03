@@ -133,7 +133,15 @@ export default function Navbar() {
           </a>
         </div>
       </div>
-
+      {/* Sticky CTA bar (shows after scroll) */}
+      <div className={`sticky-cta${scrolled ? ' visible' : ''}`}>
+        <a href="tel:+923086891083" className="sticky-cta-btn">
+          <i className="fas fa-phone" /> Call Now
+        </a>
+        <a href="https://wa.me/923086891083" target="_blank" rel="noreferrer" className="sticky-cta-btn">
+          <i className="fab fa-whatsapp" /> WhatsApp Booking
+        </a>
+      </div>
     </>
   )
 }
