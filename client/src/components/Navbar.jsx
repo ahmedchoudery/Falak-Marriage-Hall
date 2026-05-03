@@ -15,16 +15,12 @@ const links = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [progress, setProgress] = useState(0)
+
   const { pathname } = useLocation()
 
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 60)
-      const el = document.documentElement
-      const sc = el.scrollTop || document.body.scrollTop
-      const height = el.scrollHeight - el.clientHeight
-      setProgress(height > 0 ? (sc / height) * 100 : 0)
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -50,8 +46,7 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Scroll progress bar */}
-      <div className="progress-bar" style={{ width: `${progress}%` }} />
+
 
       <nav className={`navbar${scrolled || pathname !== '/' ? ' scrolled' : ''}`}>
         <div className="container nav-inner">
@@ -139,15 +134,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Sticky CTA bar (shows after scroll) */}
-      <div className={`sticky-cta${scrolled ? ' visible' : ''}`}>
-        <a href="tel:+923086891083" className="sticky-cta-btn">
-          <i className="fas fa-phone" /> Call Now
-        </a>
-        <a href="https://wa.me/923086891083" target="_blank" rel="noreferrer" className="sticky-cta-btn">
-          <i className="fab fa-whatsapp" /> WhatsApp Booking
-        </a>
-      </div>
     </>
   )
 }

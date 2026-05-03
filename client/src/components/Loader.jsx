@@ -52,9 +52,6 @@ export default function Loader() {
     <div ref={overlayRef} className={`loader-overlay${hidden ? ' hidden' : ''}`}>
       <span className="loader-logo">FALAK HALL</span>
       <span className="loader-tagline">Gujrat's Finest Wedding Venue</span>
-      <div className="loader-bar-wrap">
-        <div className="loader-bar-fill" style={{ width: `${progress}%` }} />
-      </div>
     </div>
   )
 }

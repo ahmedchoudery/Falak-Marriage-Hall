@@ -99,23 +99,19 @@ export default function Hero() {
     }).add({
       targets: '.hero-label',
       opacity: [0, 1],
-      translateY: [20, 0],
       duration: 700,
     }, '-=400').add({
       targets: '.hero-title .char',
       opacity:    [0, 1],
-      translateY: [70, 0],
       duration: 800,
       delay: anime.stagger(35, { from: 'first' }),
     }, '-=300').add({
       targets: '.hero-subtitle',
       opacity: [0, 1],
-      translateY: [20, 0],
       duration: 600,
     }, '-=200').add({
       targets: '.hero-btns',
       opacity: [0, 1],
-      translateY: [20, 0],
       duration: 500,
     }, '-=300')
 
@@ -157,11 +153,6 @@ export default function Hero() {
             <i className="fas fa-images" /> View Gallery
           </a>
         </div>
-      </div>
-
-      <div className="hero-scroll">
-        <div className="hero-scroll-line" />
-        <span>Scroll</span>
       </div>
     </section>
   )

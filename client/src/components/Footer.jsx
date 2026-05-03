@@ -90,16 +90,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* WhatsApp Float */}
-      <a
-        href="https://wa.me/923086891083"
-        className="whatsapp-float"
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Chat on WhatsApp"
-      >
-        <i className="fab fa-whatsapp" />
-      </a>
     </footer>
   )
 }

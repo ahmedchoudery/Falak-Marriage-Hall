@@ -643,16 +643,16 @@ section {
   font-family: var(--font-display);
   font-size: clamp(3rem, 8vw, 6.5rem);
   font-weight: 700;
-  line-height: 1.05;
+  line-height: 1.1;
   color: var(--cream);
   margin-bottom: 24px;
-  overflow: hidden;
+  overflow: visible;
+  padding-bottom: 0.15em;
 }
 
 .hero-title .char {
   display: inline-block;
   opacity: 0;
-  transform: translateY(80px);
 }
 
 .hero-subtitle {
@@ -672,52 +672,7 @@ section {
   opacity: 0;
 }
 
-.hero-scroll {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-muted);
-  font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  opacity: 0;
-  animation: fadeIn 1s 2.5s forwards;
-}
-
-.hero-scroll-line {
-  width: 1px;
-  height: 50px;
-  background: linear-gradient(to bottom, var(--gold), transparent);
-  animation: scrollLine 2s ease infinite;
-}
-
-@keyframes scrollLine {
-  0% {
-    transform: scaleY(0);
-    transform-origin: top;
-  }
-
-  50% {
-    transform: scaleY(1);
-    transform-origin: top;
-  }
-
-  51% {
-    transform: scaleY(1);
-    transform-origin: bottom;
-  }
-
-  100% {
-    transform: scaleY(0);
-    transform-origin: bottom;
-  }
-}
+/* hero scroll indicator removed */
 
 @keyframes fadeIn {
   to {
@@ -1667,30 +1622,7 @@ a.contact-item-value:hover {
   color: var(--text-muted);
 }
 
-/* WhatsApp Float */
-.whatsapp-float {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 58px;
-  height: 58px;
-  background: #25d366;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.6rem;
-  z-index: 900;
-  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
-  transition: all 0.35s var(--ease-bounce);
-  
-}
-
-.whatsapp-float:hover {
-  transform: scale(1.1) rotate(-10deg);
-  box-shadow: 0 12px 35px rgba(37, 211, 102, 0.55);
-}
+/* whatsapp-float button removed — link exists in footer social icons */
 
 /* ─── Booking Page ───────────────────────────────────── */
 .booking-page {
@@ -1853,48 +1785,7 @@ select.form-control option {
   transition: width 0.1s linear;
 }
 
-/* ─── Sticky Bar ─────────────────────────────────────── */
-.sticky-cta {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--gold);
-  display: flex;
-  z-index: 800;
-  transform: translateY(100%);
-  transition: transform 0.4s var(--ease);
-}
-
-.sticky-cta.visible {
-  transform: translateY(0);
-}
-
-.sticky-cta-btn {
-  flex: 1;
-  padding: 14px;
-  color: var(--dark);
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-right: 1px solid rgba(6, 14, 12, 0.15);
-  transition: background 0.3s;
-}
-
-.sticky-cta-btn:last-child {
-  background: #25d366;
-  color: white;
-  border: none;
-}
-
-.sticky-cta-btn:hover {
-  background: rgba(0, 0, 0, 0.08);
-}
+/* sticky-cta bar removed — element no longer in Navbar.jsx */
 
 /* ─── Responsive ─────────────────────────────────────── */
 @media (max-width: 1024px) {
@@ -2824,6 +2715,7 @@ select.admin-input option {
   padding: 120px 0;
   background: linear-gradient(180deg, var(--dark) 0%, var(--dark-2) 50%, var(--dark) 100%);
   position: relative;
+  overflow-x: hidden;
 }
 
 .menu-builder-subtitle {
