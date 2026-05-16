@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
-export default function ParallaxBanner({ image = '/images/gallery_1.png', children }) {
+export default function ParallaxBanner({ image = '/images/gallery_1.png', children = null }) {
   return (
     <section
       className="parallax-banner"
@@ -15,7 +15,7 @@ export default function ParallaxBanner({ image = '/images/gallery_1.png', childr
           <p style={{ margin: '16px 0 36px' }}>
             Experience royal hospitality and breathtaking décor tailored to your vision.
           </p>
-          <Link to="/booking" className="btn btn-gold">
+          <Link href="/booking" className="btn btn-gold">
             <i className="fas fa-calendar-check" /> Reserve Your Date
           </Link>
         </div>

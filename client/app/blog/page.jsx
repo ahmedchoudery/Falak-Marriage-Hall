@@ -1,5 +1,7 @@
+'use client'
+
 import { useState } from 'react'
-import { useReveal } from '../hooks/useReveal'
+import { useReveal } from '@/hooks/useReveal'
 
 /* ── Blog Articles Data ─────────────────────────────────── */
 const ARTICLES = [
@@ -123,7 +125,7 @@ const ARTICLES = [
 const CATEGORIES = ['All', ...new Set(ARTICLES.map(a => a.category))]
 
 /* ── Component ──────────────────────────────────────────── */
-export default function Blog() {
+export default function BlogPage() {
   const [headRef, headVisible] = useReveal()
   const [activeCategory, setActiveCategory] = useState('All')
   const [expandedArticle, setExpandedArticle] = useState(null)
@@ -145,7 +147,7 @@ export default function Blog() {
       {/* Hero Header */}
       <div className="blog-hero">
         <div className="container">
-          <span className="section-label" style={{ display: 'block', textAlign: 'center' }}>
+          <span className="section-label center-text">
             Inspiration & Insights
           </span>
           <h1

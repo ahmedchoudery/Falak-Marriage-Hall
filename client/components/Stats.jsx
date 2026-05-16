@@ -1,3 +1,5 @@
+'use client'
+
 import { useCounter, useReveal } from '../hooks/useReveal'
 
 const stats = [
@@ -11,10 +13,15 @@ function StatItem({ icon, target, suffix, label, delay }) {
   const [numRef, count] = useCounter(target)
   const [ref, visible]  = useReveal({ delay })
   return (
-    <div ref={ref} className={`stat-item reveal${visible ? ' visible' : ''}`}>
-      <i className={icon} />
-      <span ref={numRef} className="stat-number">{count}{suffix}</span>
-      <span className="stat-label">{label}</span>
+    <div ref={ref} className={`stat-card reveal${visible ? ' visible' : ''}`}>
+      <div className="stat-icon-wrapper">
+        <i className={icon} />
+      </div>
+      <div className="stat-info">
+        <span ref={numRef} className="stat-number">{count}{suffix}</span>
+        <span className="stat-label">{label}</span>
+      </div>
+      <div className="stat-card-glow" />
     </div>
   )
 }

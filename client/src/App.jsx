@@ -1,14 +1,19 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import Loader from './components/Loader'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
-import Home from './pages/Home'
-import BookingPage from './pages/BookingPage'
-import ContactPage from './pages/ContactPage'
-import AdminLogin from './pages/AdminLogin'
-import AdminDashboard from './pages/AdminDashboard'
-import Blog from './pages/Blog'
+
+// Lazy load pages for performance (react-best-practices: bundle-dynamic-imports)
+const Home = lazy(() => import('./pages/Home'))
+const BookingPage = lazy(() => import('./pages/BookingPage'))
+const ContactPage = lazy(() => import('./pages/ContactPage'))
+const AdminLogin = lazy(() => import('./pages/AdminLogin'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
+const Blog = lazy(() => import('./pages/Blog'))
+
+import { AuthProvider, useAuth } from './context/AuthContext'
+import ErrorBoundary from './components/ErrorBoundary'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -28,27 +33,35 @@ function Layout({ children }) {
 
 // Protect admin dashboard — redirect to login if no session token
 function AdminGuard() {
-  const token = sessionStorage.getItem('adminToken')
-  return token ? <AdminDashboard /> : <Navigate to="/admin" replace />
+  const { isAuthenticated } = useAuth()
+  return isAuthenticated ? <AdminDashboard /> : <Navigate to="/admin" replace />
 }
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
+          {/* Global Loader for initial mount if needed */}
+          <Loader />
+          <ScrollToTop />
+          
+          {/* Suspense boundary for lazy-loaded routes */}
+          <Suspense fallback={<Loader />}>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Layout><Home /></Layout>} />
+              <Route path="/booking" element={<Layout><BookingPage /></Layout>} />
+              <Route path="/blog" element={<Layout><Blog /></Layout>} />
+              <Route path="/contact" element={<Layout><ContactPage /></Layout>} />
 
-      <Loader />
-      <ScrollToTop />
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<Layout><Home /></Layout>} />
-        <Route path="/booking" element={<Layout><BookingPage /></Layout>} />
-        <Route path="/blog" element={<Layout><Blog /></Layout>} />
-        <Route path="/contact" element={<Layout><ContactPage /></Layout>} />
-
-        {/* Admin routes — no Navbar/Footer */}
-        <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminGuard />} />
-      </Routes>
-    </BrowserRouter>
+              {/* Admin routes — no Navbar/Footer */}
+              <Route path="/admin" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminGuard />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }

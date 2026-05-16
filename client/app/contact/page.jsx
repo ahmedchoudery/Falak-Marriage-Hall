@@ -1,7 +1,9 @@
+'use client'
+
 import { useEffect } from 'react'
 import anime from 'animejs'
-import { useReveal } from '../hooks/useReveal'
-import { Link } from 'react-router-dom'
+import { useReveal } from '@/hooks/useReveal'
+import Link from 'next/link'
 
 const contactItems = [
   { icon: 'fas fa-map-marker-alt', label: 'Address',  value: 'GT Road, Service Mor, Servis Industries, Gujrat 50700, Punjab, Pakistan' },
@@ -49,19 +51,19 @@ export default function ContactPage() {
 
   return (
     <div className="contact-page">
-      <div style={{ padding: '80px 0 60px', textAlign: 'center', background: 'linear-gradient(to bottom, var(--dark-3), var(--dark-2))', borderBottom: '1px solid var(--gold-border)' }}>
+      <div className="contact-hero">
         <div className="container">
-          <span className="section-label" style={{ display: 'block', textAlign: 'center' }}>Get In Touch</span>
-          <h1 className="contact-page-title" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.5rem, 6vw, 5rem)', color: 'var(--cream)', lineHeight: 1.1 }}>
+          <span className="section-label">Get In Touch</span>
+          <h1 className="contact-page-title">
             {titleChars}
           </h1>
-          <p style={{ color: 'var(--text-muted)', marginTop: 16, fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: '1.1rem' }}>
+          <p className="contact-hero-subtitle">
             Located at the heart of Gujrat on Main GT Road.
           </p>
         </div>
       </div>
 
-      <section style={{ background: 'var(--dark-2)', padding: 'clamp(60px, 8vw, 100px) 0' }}>
+      <section className="contact-map-section">
         <div className="container">
           <div className="location-grid">
             <div ref={leftRef} className={`map-frame reveal-left${leftVisible ? ' visible' : ''}`}>
@@ -81,9 +83,6 @@ export default function ContactPage() {
                     {item.href ? (
                       <a href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel="noreferrer"
                         className="contact-item-value"
-                        style={{ display: 'block', color: 'var(--text)', transition: 'color .3s' }}
-                        onMouseEnter={e => e.target.style.color = 'var(--gold)'}
-                        onMouseLeave={e => e.target.style.color = 'var(--text)'}
                       >{item.value}</a>
                     ) : (
                       <span className="contact-item-value">{item.value}</span>
@@ -91,12 +90,12 @@ export default function ContactPage() {
                   </div>
                 </div>
               ))}
-              <div style={{ display: 'flex', gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
-                <Link to="/booking" className="btn btn-gold" style={{ flex: 1, justifyContent: 'center', minWidth: 160 }}>
+              <div className="contact-actions">
+                <Link href="/booking" className="btn btn-gold">
                   <i className="fas fa-calendar-check" /> Book Now
                 </Link>
                 <a href="https://maps.app.goo.gl/tCKXtTQEV2rjiqJs8" target="_blank" rel="noreferrer"
-                  className="btn btn-outline" style={{ flex: 1, justifyContent: 'center', minWidth: 160 }}>
+                  className="btn btn-outline">
                   <i className="fas fa-directions" /> Get Directions
                 </a>
               </div>
@@ -105,9 +104,9 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section style={{ background: 'var(--dark)', padding: 'clamp(60px, 8vw, 100px) 0' }}>
+      <section className="contact-info-cards-section">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+          <div className="contact-info-grid">
             {infoCards.map((card, i) => <InfoCard key={card.title} {...card} delay={i * 100} />)}
           </div>
         </div>

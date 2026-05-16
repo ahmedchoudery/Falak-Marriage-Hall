@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -10,7 +10,7 @@ export default function Footer() {
 
           {/* Brand */}
           <div>
-            <Link to="/" className="footer-brand-logo">FALAK HALL</Link>
+            <Link href="/" className="footer-brand-logo">FALAK HALL</Link>
             <p className="footer-brand-desc">
               The premier wedding venue in Gujrat, dedicated to providing luxury, elegance,
               and unforgettable memories for your most precious day.
@@ -35,12 +35,12 @@ export default function Footer() {
           <div className="footer-col">
             <h4>Quick Links</h4>
             <ul className="footer-links">
-              <li><a href="/#home">Home</a></li>
-              <li><a href="/#about">About Us</a></li>
-              <li><a href="/#services">Services</a></li>
-              <li><a href="/#gallery">Gallery</a></li>
-              <li><Link to="/booking">Online Booking</Link></li>
-              <li><Link to="/contact">Contact</Link></li>
+              <li><Link href="/#home">Home</Link></li>
+              <li><Link href="/#about">About Us</Link></li>
+              <li><Link href="/#services">Services</Link></li>
+              <li><Link href="/#gallery">Gallery</Link></li>
+              <li><Link href="/booking">Online Booking</Link></li>
+              <li><Link href="/contact">Contact</Link></li>
             </ul>
           </div>
 
@@ -48,12 +48,12 @@ export default function Footer() {
           <div className="footer-col">
             <h4>Our Services</h4>
             <ul className="footer-links">
-              <li><a href="/#services">Wedding Ceremony</a></li>
-              <li><a href="/#services">Mehndi Events</a></li>
-              <li><a href="/#services">Walima Reception</a></li>
-              <li><a href="/#services">Luxury Catering</a></li>
-              <li><a href="/#services">Stage Decoration</a></li>
-              <li><a href="/#services">Photography</a></li>
+              <li><Link href="/#services">Wedding Ceremony</Link></li>
+              <li><Link href="/#services">Mehndi Events</Link></li>
+              <li><Link href="/#services">Walima Reception</Link></li>
+              <li><Link href="/#services">Luxury Catering</Link></li>
+              <li><Link href="/#services">Stage Decoration</Link></li>
+              <li><Link href="/#services">Photography</Link></li>
             </ul>
           </div>
 

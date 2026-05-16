@@ -1,6 +1,8 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import anime from 'animejs'
-import { useReveal } from '../hooks/useReveal'
+import { useReveal } from '@/hooks/useReveal'
 
 const eventTypes = [
   'Wedding (Nikah)',
@@ -21,14 +23,14 @@ function FormField({ label, required, error, children }) {
   return (
     <div className="form-group">
       <label>
-        {label} {required && <span>*</span>}
+        {label} {required ? <span>*</span> : null}
       </label>
       {children}
-      {error && (
+      {error ? (
         <span style={{ color: '#e74c3c', fontSize: '0.78rem', marginTop: 6, display: 'block' }}>
           {error}
         </span>
-      )}
+      ) : null}
     </div>
   )
 }
@@ -136,40 +138,23 @@ export default function BookingPage() {
   return (
     <div className="booking-page">
       {/* Hero Header */}
-      <div
-        className="booking-hero"
-        style={{
-          padding: '100px 0 80px',
-          textAlign: 'center',
-          position: 'relative',
-          overflow: 'hidden',
-          borderBottom: '1px solid var(--gold-border)',
-        }}
-      >
+      <div className="booking-hero">
         <div className="booking-hero-pattern" />
-        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-          <span className="section-label" style={{ display: 'block', textAlign: 'center' }}>
+        <div className="container">
+          <span className="section-label">
             Reserve Your Date
           </span>
-          <h1
-            className="booking-page-title"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.5rem, 6vw, 5rem)',
-              color: 'var(--cream)',
-              lineHeight: 1.1,
-            }}
-          >
+          <h1 className="booking-page-title">
             {titleChars}
           </h1>
-          <p style={{ color: 'var(--text-muted)', marginTop: 16, fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: '1.1rem' }}>
-            Fill in the form below and our team will confirm within 24 hours.
+          <p className="booking-hero-subtitle">
+            Fill in the form below and our team will contact you within 24 hours.
           </p>
         </div>
       </div>
 
       {/* Form + Info grid */}
-      <div className="container" style={{ padding: '80px clamp(20px, 5vw, 60px)' }}>
+      <div className="container booking-container">
         <div className="booking-grid">
 
           {/* ── Form ── */}
@@ -209,7 +194,7 @@ export default function BookingPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate>
-                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: 'var(--cream)', marginBottom: 28, paddingBottom: 20, borderBottom: '1px solid var(--gold-border)' }}>
+                <h3 className="form-header">
                   Event Details
                 </h3>
 
@@ -295,26 +280,24 @@ export default function BookingPage() {
                     placeholder="Tell us about your theme preferences, catering needs, special requests…"
                     value={form.message}
                     onChange={e => set('message', e.target.value)}
-                    style={{ resize: 'vertical' }}
                   />
                 </FormField>
 
                 <button
                   type="submit"
-                  className={`btn btn-gold${loading ? ' is-loading' : ''}`}
+                  className={`btn btn-gold btn-booking-submit${loading ? ' is-loading' : ''}`}
                   disabled={loading}
-                  style={{ width: '100%', justifyContent: 'center', fontSize: '0.85rem', padding: '16px 0', letterSpacing: '0.2em' }}
                 >
                   {loading ? (
                     <><i className="fas fa-circle-notch fa-spin" /> Submitting…</>
                   ) : (
-                    <><i className="fas fa-lock" style={{ fontSize: '0.7rem', opacity: 0.7 }} /> Secure Booking Inquiry</>
+                    <><i className="fas fa-lock" /> Secure Booking Inquiry</>
                   )}
                 </button>
 
-                <p style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 16 }}>
+                <p className="booking-disclaimer">
                   We'll call you on your given Contact. We'll confirm within 24 hours. For urgent booking, call{' '}
-                  <a href="tel:+923086891083" style={{ color: 'var(--gold)' }}>0308-6891083</a>
+                  <a href="tel:+923086891083">0308-6891083</a>
                 </p>
               </form>
             )}
@@ -365,8 +348,7 @@ export default function BookingPage() {
               <h3>Quick Contact</h3>
               <a
                 href="tel:+923086891083"
-                className="btn btn-gold"
-                style={{ width: '100%', justifyContent: 'center', marginBottom: 12 }}
+                className="btn btn-gold btn-booking-call"
               >
                 <i className="fas fa-phone" /> Call: 0308-6891083
               </a>
@@ -381,12 +363,12 @@ export default function BookingPage() {
               </a>
             </div>
 
-            <div className="booking-info-card" style={{ background: 'var(--dark-3)' }}>
-              <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '1.05rem', lineHeight: 1.7 }}>
+            <div className="booking-info-card quote-card">
+              <p>
                 "Submit your inquiry above and our event experts will contact you within 24 hours to plan your perfect day."
               </p>
-              <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--gold-border)' }}>
-                <span style={{ fontSize: '0.7rem', color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+              <div className="quote-author">
+                <span>
                   — Falak Hall & Events Team
                 </span>
               </div>

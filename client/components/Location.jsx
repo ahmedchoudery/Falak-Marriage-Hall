@@ -1,5 +1,7 @@
+'use client'
+
 import { useReveal } from '../hooks/useReveal'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 const contactItems = [
   {
@@ -43,7 +45,7 @@ export default function Location() {
           <span className="section-label">Find Us</span>
           <h2>Visit Falak Hall</h2>
           <div className="gold-divider" />
-          <p style={{ color: 'var(--text-muted)', marginTop: 20, fontSize: '0.95rem' }}>
+          <p className="location-subtitle">
             Centrally located on GT Road — easy to reach from across Gujrat and beyond.
           </p>
         </div>
@@ -52,7 +54,7 @@ export default function Location() {
           {/* Map */}
           <div
             ref={leftRef}
-            className={`map-frame reveal-left${leftVisible ? ' visible' : ''}`}
+            className={`map-frame-wrapper reveal-left${leftVisible ? ' visible' : ''}`}
           >
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3361.678214961768!2d74.04985250952028!3d32.58810477363364!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391f1ab545de0947%3A0x19f9b9caa6ba6177!2sFalak%20Marriage%20Hall!5e0!3m2!1sen!2s!4v1772830377925!5m2!1sen!2s"
@@ -60,43 +62,46 @@ export default function Location() {
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               title="Falak Marriage Hall Location"
+              className="location-map"
             />
           </div>
 
           {/* Contact Details */}
           <div
             ref={rightRef}
-            className={`contact-details reveal-right${rightVisible ? ' visible' : ''}`}
+            className={`contact-info reveal-right${rightVisible ? ' visible' : ''}`}
           >
-            {contactItems.map((item) => (
-              <div className="contact-item" key={item.label}>
-                <div className="contact-item-icon">
-                  <i className={item.icon} />
+            <div className="contact-items-grid">
+              {contactItems.map((item) => (
+                <div className="contact-info-item" key={item.label}>
+                  <div className="contact-info-icon">
+                    <i className={item.icon} />
+                  </div>
+                  <div className="contact-info-text">
+                    <span className="contact-info-label">{item.label}</span>
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        target={item.href.startsWith('http') ? '_blank' : undefined}
+                        rel="noreferrer"
+                        className="contact-info-value"
+                      >
+                        {item.value}
+                      </a>
+                    ) : (
+                      <span className="contact-info-value">{item.value}</span>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <span className="contact-item-label">{item.label}</span>
-                  {item.href ? (
-                    <a
-                      href={item.href}
-                      target={item.href.startsWith('http') ? '_blank' : undefined}
-                      rel="noreferrer"
-                      className="contact-item-value"
-                    >
-                      {item.value}
-                    </a>
-                  ) : (
-                    <span className="contact-item-value">{item.value}</span>
-                  )}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
 
             <Link
-              to="/booking"
-              className="btn btn-gold"
-              style={{ marginTop: 8, width: '100%', justifyContent: 'center' }}
+              href="/booking"
+              className="btn btn-gold btn-full mt-24"
             >
-              <i className="fas fa-calendar-check" /> Book Your Date Now
+              <span>Book Your Date Now</span>
+              <i className="fas fa-calendar-check" />
             </Link>
           </div>
         </div>

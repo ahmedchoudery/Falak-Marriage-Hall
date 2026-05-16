@@ -1,5 +1,8 @@
+'use client'
+
 import { useReveal } from '../hooks/useReveal'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
+import Image from 'next/image'
 
 const features = [
   'Professional Management',
@@ -15,7 +18,7 @@ export default function About() {
   const [textRef, textVisible] = useReveal({ delay: 150 })
 
   return (
-    <section id="about" style={{ background: 'var(--dark)', padding: 'clamp(80px, 10vw, 130px) 0' }}>
+    <section id="about" className="about-section">
       <div className="container">
         <div className="about-grid">
 
@@ -24,16 +27,26 @@ export default function About() {
             ref={imgRef}
             className={`about-image-stack reveal-left${imgVisible ? ' visible' : ''}`}
           >
-            <img
-              src="/images/2.jpeg"
-              alt="Falak Hall exterior"
-              className="about-img-main"
-            />
-            <img
-              src="/images/1.jpeg"
-              alt="Hall building"
-              className="about-img-secondary"
-            />
+            <div className="about-img-main-wrapper">
+              <Image
+                src="/images/2.jpeg"
+                alt="Falak Hall exterior"
+                width={600}
+                height={450}
+                className="about-img-main"
+                priority={false}
+              />
+            </div>
+            <div className="about-img-secondary-wrapper">
+              <Image
+                src="/images/1.jpeg"
+                alt="Hall building"
+                width={400}
+                height={300}
+                className="about-img-secondary"
+                priority={false}
+              />
+            </div>
             <div className="about-badge">
               <div className="about-badge-ring" />
               <span className="about-badge-num">10+</span>
@@ -67,9 +80,15 @@ export default function About() {
               ))}
             </div>
 
-            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-              <Link to="/booking" className="btn btn-gold">Book a Visit</Link>
-              <Link to="/contact" className="btn btn-outline">Get In Touch</Link>
+            <div className="about-actions">
+              <Link href="/booking" className="btn btn-gold">
+                <span>Book a Visit</span>
+                <i className="fas fa-calendar-check" />
+              </Link>
+              <Link href="/contact" className="btn btn-outline">
+                <span>Get In Touch</span>
+                <i className="fas fa-envelope" />
+              </Link>
             </div>
           </div>
 

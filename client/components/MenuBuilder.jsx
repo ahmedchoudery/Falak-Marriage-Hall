@@ -1,6 +1,8 @@
-import { useState, useMemo } from 'react'
+'use client'
+
+import { useState, useMemo, useCallback, memo, useEffect } from 'react'
 import { useReveal } from '../hooks/useReveal'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 /* ── Menu Data ──────────────────────────────────────────── */
 const CATEGORIES = [
@@ -70,14 +72,47 @@ const CATEGORIES = [
   },
 ]
 
-/* ── Helper: find item by ID ── */
 const allItems = CATEGORIES.flatMap(c => c.items)
 const findItem = (id) => allItems.find(i => i.id === id)
-
-const BASE_RATE = 1200 // Default base rate for custom menus
+const BASE_RATE = 1200
 const DEFAULT_ITEMS = ['m1', 'r1', 'r3', 'd1', 'b1']
 
-/* ── Component ──────────────────────────────────────────── */
+/* ── Memoized Sub-Components ───────────────────────────────── */
+
+const CategoryTab = memo(({ cat, active, onClick }) => (
+  <button
+    className={`mb-cat-tab${active ? ' active' : ''}`}
+    onClick={() => onClick(cat.id)}
+  >
+    <i className={cat.icon} />
+    <span>{cat.label}</span>
+  </button>
+))
+CategoryTab.displayName = 'CategoryTab'
+
+const DishCard = memo(({ item, isSelected, isDefault, onToggle }) => (
+  <button
+    className={`mb-dish-card${isSelected ? ' selected' : ''}${isDefault ? ' default' : ''}`}
+    onClick={() => onToggle(item.id)}
+  >
+    <span className="mb-dish-check">
+      <i className={isSelected ? 'fas fa-check-circle' : 'far fa-circle'} />
+    </span>
+    <span className="mb-dish-name">{item.name}</span>
+    <span className="mb-dish-price">
+      {item.price === 0 ? (
+        <span className="mb-included">Included</span>
+      ) : (
+        `+PKR ${item.price.toLocaleString()}`
+      )}
+    </span>
+    {isDefault ? <span className="mb-dish-default-tag">Default</span> : null}
+  </button>
+))
+DishCard.displayName = 'DishCard'
+
+/* ── Main Component ─────────────────────────────────────────── */
+
 export default function MenuBuilder() {
   const [headRef, headVisible] = useReveal()
   const [selectedItems, setSelectedItems] = useState(new Set(DEFAULT_ITEMS))
@@ -85,15 +120,20 @@ export default function MenuBuilder() {
   const [activeCategory, setActiveCategory] = useState('mains')
   const [stickyVisible, setStickyVisible] = useState(false)
 
-  /* Toggle a dish */
-  const toggleItem = (itemId) => {
+  /* Stabilized Toggle Dish */
+  const toggleItem = useCallback((itemId) => {
     setSelectedItems(prev => {
       const next = new Set(prev)
       if (next.has(itemId)) next.delete(itemId)
       else next.add(itemId)
       return next
     })
-  }
+  }, [])
+
+  /* Stabilized Tab Switch */
+  const switchCategory = useCallback((id) => {
+    setActiveCategory(id)
+  }, [])
 
   /* ── Price Calculation ── */
   const pricing = useMemo(() => {
@@ -110,16 +150,13 @@ export default function MenuBuilder() {
   const formatPrice = (n) => `PKR ${n.toLocaleString()}`
 
   /* ── Mobile Sticky Visibility ── */
-  useState(() => {
+  useEffect(() => {
     const handleScroll = () => {
       const section = document.getElementById('menu-builder')
       if (!section) return
-      
       const rect = section.getBoundingClientRect()
-      const isVisible = rect.top < window.innerHeight && rect.bottom > 100
-      setStickyVisible(isVisible)
+      setStickyVisible(rect.top < window.innerHeight && rect.bottom > 100)
     }
-    
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -142,50 +179,33 @@ export default function MenuBuilder() {
 
         {/* ── Main Builder Area ── */}
         <div className="mb-builder">
-          {/* Left: Category tabs + dish list */}
+          {/* Left: Dishes */}
           <div className="mb-dishes">
             <div className="mb-cat-tabs">
               {CATEGORIES.map(cat => (
-                <button
-                  key={cat.id}
-                  className={`mb-cat-tab${activeCategory === cat.id ? ' active' : ''}`}
-                  onClick={() => setActiveCategory(cat.id)}
-                >
-                  <i className={cat.icon} />
-                  <span>{cat.label}</span>
-                </button>
+                <CategoryTab 
+                  key={cat.id} 
+                  cat={cat} 
+                  active={activeCategory === cat.id} 
+                  onClick={switchCategory} 
+                />
               ))}
             </div>
 
             <div className="mb-dish-grid">
-              {CATEGORIES.find(c => c.id === activeCategory)?.items.map(item => {
-                const isSelected = selectedItems.has(item.id)
-                const isDefault = DEFAULT_ITEMS.includes(item.id)
-                return (
-                  <button
-                    key={item.id}
-                    className={`mb-dish-card${isSelected ? ' selected' : ''}${isDefault ? ' default' : ''}`}
-                    onClick={() => toggleItem(item.id)}
-                  >
-                    <span className="mb-dish-check">
-                      <i className={isSelected ? 'fas fa-check-circle' : 'far fa-circle'} />
-                    </span>
-                    <span className="mb-dish-name">{item.name}</span>
-                    <span className="mb-dish-price">
-                      {item.price === 0 ? (
-                        <span className="mb-included">Included</span>
-                      ) : (
-                        `+${formatPrice(item.price)}`
-                      )}
-                    </span>
-                    {isDefault && <span className="mb-dish-default-tag">Default</span>}
-                  </button>
-                )
-              })}
+              {CATEGORIES.find(c => c.id === activeCategory)?.items.map(item => (
+                <DishCard 
+                  key={item.id} 
+                  item={item} 
+                  isSelected={selectedItems.has(item.id)} 
+                  isDefault={DEFAULT_ITEMS.includes(item.id)} 
+                  onToggle={toggleItem} 
+                />
+              ))}
             </div>
           </div>
 
-          {/* Right: Summary panel */}
+          {/* Right: Summary */}
           <div className="mb-summary">
             <div className="mb-summary-card">
               <h3 className="mb-summary-title">
@@ -209,7 +229,7 @@ export default function MenuBuilder() {
                 </div>
               </div>
 
-              {/* Custom Menu Details */}
+              {/* Price Details */}
               <div className="mb-summary-details">
                 <div className="mb-summary-row">
                   <span>Base Event Rate</span>
@@ -219,9 +239,7 @@ export default function MenuBuilder() {
                   <span>Custom Add-ons</span>
                   <span>{pricing.extraPerHead > 0 ? `+${formatPrice(pricing.extraPerHead)}` : 'Included'}</span>
                 </div>
-
                 <div className="mb-summary-divider" />
-
                 <div className="mb-summary-row mb-total-row">
                   <span>Total / Head</span>
                   <strong className="mb-gold">{formatPrice(pricing.totalPerHead)}</strong>
@@ -233,7 +251,7 @@ export default function MenuBuilder() {
                 <strong className="mb-grand-price">{formatPrice(pricing.estimatedTotal)}</strong>
               </div>
 
-              {/* Selected dishes list */}
+              {/* Selected List */}
               <div className="mb-selected-list">
                 <div className="mb-list-header">
                   <h4>Selected Dishes</h4>
@@ -255,14 +273,10 @@ export default function MenuBuilder() {
                 </ul>
               </div>
 
-              <Link
-                to="/booking"
-                className="btn btn-gold mb-book-btn"
-              >
+              <Link href="/booking" className="btn btn-gold mb-book-btn">
                 <span>Book This Menu</span>
                 <i className="fas fa-arrow-right" />
               </Link>
-
               <p className="mb-disclaimer">
                 * Prices are estimates. Final pricing confirmed after consultation.
               </p>
@@ -270,15 +284,13 @@ export default function MenuBuilder() {
           </div>
         </div>
 
-        {/* ── Mobile Sticky Total ── */}
+        {/* ── Mobile Sticky ── */}
         <div className={`mb-mobile-sticky ${stickyVisible ? 'visible' : ''}`}>
           <div className="mb-sticky-info">
             <span className="mb-sticky-label">Estimated Total</span>
             <span className="mb-sticky-price">{formatPrice(pricing.estimatedTotal)}</span>
           </div>
-          <Link to="/booking" className="mb-sticky-btn">
-            Book Now
-          </Link>
+          <Link href="/booking" className="mb-sticky-btn">Book Now</Link>
         </div>
       </div>
     </section>

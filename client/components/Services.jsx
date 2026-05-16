@@ -1,3 +1,5 @@
+'use client'
+
 import { useReveal } from '../hooks/useReveal'
 
 const services = [
@@ -59,18 +61,23 @@ export default function Services() {
 }
 
 function ServiceCard({ icon, title, desc, index }) {
-  const [ref, visible] = useReveal({ delay: index * 80 })
+  const [ref, visible] = useReveal({ delay: index * 100 })
 
   return (
     <div
       ref={ref}
       className={`service-card reveal-scale${visible ? ' visible' : ''}`}
     >
-      <div className="service-icon">
-        <i className={icon} />
+      <div className="service-card-inner">
+        <div className="service-icon">
+          <i className={icon} />
+        </div>
+        <div className="service-content">
+          <h3>{title}</h3>
+          <p>{desc}</p>
+        </div>
+        <div className="service-card-accent" />
       </div>
-      <h3>{title}</h3>
-      <p>{desc}</p>
     </div>
   )
 }

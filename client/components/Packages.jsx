@@ -1,5 +1,7 @@
+'use client'
+
 import { useReveal } from '../hooks/useReveal'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 const packages = [
   {
@@ -85,7 +87,7 @@ function PackageCard({ tier, name, desc, features, featured, badge, index }) {
       ref={ref}
       className={`package-card reveal${visible ? ' visible' : ''}${featured ? ' featured' : ''}`}
     >
-      {badge && <div className="package-badge">{badge}</div>}
+      {badge ? <div className="package-badge">{badge}</div> : null}
       <div className="package-tier">{tier}</div>
       <div className="package-name">{name} Package</div>
       <p className="package-desc">{desc}</p>
@@ -100,7 +102,7 @@ function PackageCard({ tier, name, desc, features, featured, badge, index }) {
       </ul>
 
       <Link
-        to="/booking"
+        href="/booking"
         className={`btn ${featured ? 'btn-gold' : 'btn-outline'}`}
         style={{ width: '100%', justifyContent: 'center' }}
       >

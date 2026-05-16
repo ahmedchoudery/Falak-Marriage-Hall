@@ -1,33 +1,34 @@
+'use client'
+
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 // ── helpers ────────────────────────────────────────────────────────────────
 const STATUS_COLORS = {
-    pending: { bg: 'rgba(255,193,7,0.15)', color: '#ffc107', label: 'Pending' },
-    approved: { bg: 'rgba(40,167,69,0.15)', color: '#28a745', label: 'Approved' },
-    rejected: { bg: 'rgba(220,53,69,0.15)', color: '#dc3545', label: 'Rejected' },
-    manual: { bg: 'rgba(198,167,105,0.15)', color: '#C6A769', label: 'Manual' },
+    pending: { bg: 'rgba(229, 193, 126, 0.15)', color: '#E5C17E', label: 'Pending' },
+    approved: { bg: 'rgba(52, 211, 153, 0.15)', color: '#34D399', label: 'Approved' },
+    rejected: { bg: 'rgba(239, 68, 68, 0.15)', color: '#EF4444', label: 'Rejected' },
+    manual: { bg: 'rgba(229, 193, 126, 0.15)', color: '#E5C17E', label: 'Manual' },
 }
 
 const SOURCE_BADGE = {
-    online: { bg: 'rgba(13,110,253,0.15)', color: '#4d94ff', label: 'Online' },
-    manual: { bg: 'rgba(198,167,105,0.15)', color: '#C6A769', label: 'Manual' },
+    online: { bg: 'rgba(59, 130, 246, 0.15)', color: '#3B82F6', label: 'Online' },
+    manual: { bg: 'rgba(229, 193, 126, 0.15)', color: '#E5C17E', label: 'Manual' },
 }
 
 function StatusPill({ status }) {
-    const s = STATUS_COLORS[status] || STATUS_COLORS.pending
     return (
-        <span style={{ background: s.bg, color: s.color, padding: '3px 10px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            {s.label}
+        <span className={`admin-pill admin-pill-${status}`}>
+            {STATUS_COLORS[status]?.label || 'Pending'}
         </span>
     )
 }
 
 function SourcePill({ source }) {
-    const s = SOURCE_BADGE[source] || SOURCE_BADGE.online
     return (
-        <span style={{ background: s.bg, color: s.color, padding: '2px 8px', borderRadius: 20, fontSize: '0.65rem', fontWeight: 600, marginLeft: 6 }}>
-            {s.label}
+        <span className={`admin-pill admin-pill-${source}`}>
+            {SOURCE_BADGE[source]?.label || 'Online'}
         </span>
     )
 }
@@ -116,9 +117,9 @@ function generateInvoice(booking) {
 
 // ── main component ─────────────────────────────────────────────────────────
 export default function AdminDashboard() {
-    const navigate = useNavigate()
-    const token = sessionStorage.getItem('adminToken')
-
+    const router = useRouter()
+    
+    const [token, setToken] = useState(null)
     const [tab, setTab] = useState('bookings')   // bookings | availability | vendors | inventory
     const [filter, setFilter] = useState('all')
     const [bookings, setBookings] = useState([])
@@ -136,10 +137,23 @@ export default function AdminDashboard() {
     const [blockDate, setBlockDate] = useState('')
 
     // Vendors (localStorage)
-    const [vendors, setVendors] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('falak_vendors')) || [] } catch { return [] }
-    })
+    const [vendors, setVendors] = useState([])
     const [vendorForm, setVendorForm] = useState({ name: '', role: '', phone: '', note: '' })
+
+    // Inventory (localStorage)
+    const [inventory, setInventory] = useState(INVENTORY_DEFAULTS)
+
+    useEffect(() => {
+        setToken(sessionStorage.getItem('adminToken'))
+        try {
+            const v = JSON.parse(localStorage.getItem('falak_vendors'))
+            if (v) setVendors(v)
+        } catch { }
+        try {
+            const i = JSON.parse(localStorage.getItem('falak_inventory'))
+            if (i) setInventory(i)
+        } catch { }
+    }, [])
 
     const saveVendors = (v) => { setVendors(v); localStorage.setItem('falak_vendors', JSON.stringify(v)) }
     const addVendor = () => {
@@ -150,11 +164,6 @@ export default function AdminDashboard() {
     }
     const deleteVendor = (id) => { saveVendors(vendors.filter(v => v.id !== id)); showToast('Vendor removed.') }
 
-    // Inventory (localStorage)
-    const [inventory, setInventory] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('falak_inventory')) || INVENTORY_DEFAULTS } catch { return INVENTORY_DEFAULTS }
-    })
-
     const saveInventory = (inv) => { setInventory(inv); localStorage.setItem('falak_inventory', JSON.stringify(inv)) }
     const updateInventoryItem = (id, field, value) => {
         saveInventory(inventory.map(item => item.id === id ? { ...item, [field]: Number(value) || 0 } : item))
@@ -162,8 +171,10 @@ export default function AdminDashboard() {
 
     // ── auth guard ─────────────────────────────────────────────────────────
     useEffect(() => {
-        if (!token) navigate('/admin')
-    }, [token])
+        // Prevent redirect flash on initial load
+        if (token === null) return
+        if (!token) router.push('/admin')
+    }, [token, router])
 
     // ── api helpers ────────────────────────────────────────────────────────
     const apiHeaders = { 'Content-Type': 'application/json', 'x-admin-token': token }
@@ -174,23 +185,25 @@ export default function AdminDashboard() {
     }
 
     const fetchBookings = useCallback(async () => {
+        if (!token) return
         setLoading(true)
         try {
             const res = await fetch(`/api/admin/bookings?status=${filter}`, { headers: apiHeaders })
             const data = await res.json()
             if (data.success) setBookings(data.data)
-            else if (res.status === 401) { sessionStorage.clear(); navigate('/admin') }
+            else if (res.status === 401) { sessionStorage.clear(); router.push('/admin') }
         } catch { showToast('Failed to load bookings.', 'error') }
         finally { setLoading(false) }
-    }, [filter])
+    }, [filter, token, router]) // Added token and router to deps
 
     const fetchAvailability = useCallback(async () => {
+        if (!token) return
         try {
             const res = await fetch('/api/admin/availability', { headers: apiHeaders })
             const data = await res.json()
             if (data.success) setAvailability(data.data)
         } catch { }
-    }, [])
+    }, [token]) // Added token to deps
 
     useEffect(() => { fetchBookings() }, [fetchBookings])
     useEffect(() => { fetchAvailability() }, [fetchAvailability])
@@ -208,7 +221,7 @@ export default function AdminDashboard() {
     }
 
     const deleteBooking = async (id) => {
-        if (!confirm('Delete this booking? This cannot be undone.')) return
+        if (!window.confirm('Delete this booking? This cannot be undone.')) return
         try {
             const res = await fetch(`/api/admin/bookings/${id}`, { method: 'DELETE', headers: apiHeaders })
             const data = await res.json()
@@ -295,17 +308,19 @@ export default function AdminDashboard() {
 
     const today = new Date().toISOString().split('T')[0]
 
+    if (token === null) return null // Hide while determining auth
+
     // ── render ──────────────────────────────────────────────────────────────
     return (
         <div className="admin-wrap">
 
             {/* Toast */}
-            {toast && (
+            {toast ? (
                 <div className={`admin-toast admin-toast--${toast.type}`}>
                     <i className={`fas fa-${toast.type === 'success' ? 'check-circle' : 'exclamation-circle'}`} />
                     {toast.msg}
                 </div>
-            )}
+            ) : null}
 
             {/* Sidebar */}
             <aside className="admin-sidebar">
@@ -329,18 +344,18 @@ export default function AdminDashboard() {
 
                 <div className="admin-sidebar-stats">
                     <div className="admin-stat-mini"><span>{bookings.length}</span>Total</div>
-                    <div className="admin-stat-mini"><span style={{ color: '#ffc107' }}>{counts.pending || 0}</span>Pending</div>
-                    <div className="admin-stat-mini"><span style={{ color: '#28a745' }}>{counts.approved || 0}</span>Approved</div>
-                    <div className="admin-stat-mini"><span style={{ color: '#dc3545' }}>{counts.rejected || 0}</span>Rejected</div>
+                    <div className="admin-stat-mini"><span className="text-gold">{counts.pending || 0}</span>Pending</div>
+                    <div className="admin-stat-mini"><span className="text-success">{counts.approved || 0}</span>Approved</div>
+                    <div className="admin-stat-mini"><span className="text-danger">{counts.rejected || 0}</span>Rejected</div>
                 </div>
 
-                <button className="admin-logout" onClick={() => { sessionStorage.clear(); navigate('/admin') }}>
+                <button className="admin-logout" onClick={() => { sessionStorage.clear(); router.push('/admin') }}>
                     <i className="fas fa-sign-out-alt" /> Logout
                 </button>
 
-                <a href="/" className="admin-logout" style={{ textAlign: 'center', display: 'block', marginTop: 8, background: 'none', border: '1px solid var(--gold-border)', borderRadius: 4, padding: '10px', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+                <Link href="/" className="admin-btn-outline w-full mt-20 center-text">
                     ← View Website
-                </a>
+                </Link>
             </aside>
 
             {/* Mobile Nav Switcher — only visible on small screens */}
@@ -357,8 +372,8 @@ export default function AdminDashboard() {
                 <button className={`admin-mobile-nav-item${tab === 'inventory' ? ' active' : ''}`} onClick={() => setTab('inventory')}>
                     <i className="fas fa-boxes" />
                 </button>
-                <button className="admin-mobile-nav-item" style={{ border: 'none' }} onClick={() => { sessionStorage.clear(); navigate('/admin') }}>
-                    <i className="fas fa-sign-out-alt" style={{ color: '#dc3545' }} />
+                <button className="admin-mobile-nav-item danger" onClick={() => { sessionStorage.clear(); router.push('/admin') }}>
+                    <i className="fas fa-sign-out-alt" />
                 </button>
             </nav>
 
@@ -366,7 +381,7 @@ export default function AdminDashboard() {
             <main className="admin-main">
 
                 {/* ── BOOKINGS TAB ── */}
-                {tab === 'bookings' && (
+                {tab === 'bookings' ? (
                     <>
                         <div className="admin-header">
                             <div>
@@ -387,9 +402,9 @@ export default function AdminDashboard() {
                                     onClick={() => setFilter(f)}
                                 >
                                     {f.charAt(0).toUpperCase() + f.slice(1)}
-                                    {f === 'pending' && counts.pending > 0 && (
+                                    {f === 'pending' && counts.pending > 0 ? (
                                         <span className="admin-badge">{counts.pending}</span>
-                                    )}
+                                    ) : null}
                                 </button>
                             ))}
                         </div>
@@ -422,11 +437,11 @@ export default function AdminDashboard() {
                                                 <td>
                                                     <div className="admin-client-name">{b.name}</div>
                                                     <div className="admin-client-phone">{b.phone}</div>
-                                                    {b.email && <div className="admin-client-phone">{b.email}</div>}
+                                                    {b.email ? <div className="admin-client-phone">{b.email}</div> : null}
                                                 </td>
                                                 <td>
-                                                    <div style={{ fontWeight: 600 }}>{b.eventDate}</div>
-                                                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                                                    <div className="weight-600">{b.eventDate}</div>
+                                                    <div className="text-muted-xs mt-2">
                                                         {b.hall}
                                                     </div>
                                                 </td>
@@ -436,7 +451,7 @@ export default function AdminDashboard() {
                                                 <td><SourcePill source={b.source} /></td>
                                                 <td>
                                                     <div className="admin-actions">
-                                                        {b.status === 'pending' && (
+                                                        {b.status === 'pending' ? (
                                                             <>
                                                                 <button className="admin-action-btn approve" title="Approve" onClick={() => updateStatus(b._id, 'approved')}>
                                                                     <i className="fas fa-check" />
@@ -445,12 +460,12 @@ export default function AdminDashboard() {
                                                                     <i className="fas fa-times" />
                                                                 </button>
                                                             </>
-                                                        )}
-                                                        {b.status !== 'pending' && (
+                                                        ) : null}
+                                                        {b.status !== 'pending' ? (
                                                             <button className="admin-action-btn reset" title="Set Pending" onClick={() => updateStatus(b._id, 'pending')}>
                                                                 <i className="fas fa-undo" />
                                                             </button>
-                                                        )}
+                                                        ) : null}
                                                         <button className="admin-action-btn edit" title="Edit" onClick={() => openEdit(b)}>
                                                             <i className="fas fa-edit" />
                                                         </button>
@@ -471,10 +486,10 @@ export default function AdminDashboard() {
 
                         {/* Message preview below table if booking selected */}
                     </>
-                )}
+                ) : null}
 
                 {/* ── AVAILABILITY TAB ── */}
-                {tab === 'availability' && (
+                {tab === 'availability' ? (
                     <>
                         <div className="admin-header">
                             <div>
@@ -484,7 +499,7 @@ export default function AdminDashboard() {
                             <button 
                                 className="admin-btn-ghost" 
                                 onClick={async () => {
-                                    if (!confirm('Re-sync availability table from all approved bookings? This will fix calendar discrepancies.')) return;
+                                    if (!window.confirm('Re-sync availability table from all approved bookings? This will fix calendar discrepancies.')) return;
                                     try {
                                         const res = await fetch('/api/admin/availability/sync', { method: 'POST', headers: apiHeaders });
                                         const data = await res.json();
@@ -499,10 +514,10 @@ export default function AdminDashboard() {
                         </div>
 
                         {/* Block date form */}
-                        <div className="admin-card" style={{ marginBottom: 32 }}>
+                        <div className="admin-card mb-32">
                             <h3 className="admin-card-title">Block a Date Manually</h3>
-                            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-                                <div className="admin-form-group" style={{ marginBottom: 0, flex: 1, minWidth: 200 }}>
+                            <div className="admin-flex-row">
+                                <div className="admin-form-group mb-0 flex-1">
                                     <label>Select Date</label>
                                     <input type="date" className="admin-input" min={today} value={blockDate} onChange={e => setBlockDate(e.target.value)} />
                                 </div>
@@ -516,7 +531,7 @@ export default function AdminDashboard() {
                         <div className="admin-card">
                             <h3 className="admin-card-title">All Blocked / Booked Dates</h3>
                             {availability.length === 0 ? (
-                                <div className="admin-empty" style={{ padding: '40px 0' }}>
+                                <div className="admin-empty">
                                     <i className="fas fa-calendar-check" />
                                     <p>No dates blocked — all dates available</p>
                                 </div>
@@ -543,10 +558,10 @@ export default function AdminDashboard() {
                             )}
                         </div>
                     </>
-                )}
+                ) : null}
 
                 {/* ── VENDORS TAB ── */}
-                {tab === 'vendors' && (
+                {tab === 'vendors' ? (
                     <>
                         <div className="admin-header">
                             <div>
@@ -586,7 +601,7 @@ export default function AdminDashboard() {
                         <div className="admin-card">
                             <h3 className="admin-card-title">{vendors.length} Registered Vendors</h3>
                             {vendors.length === 0 ? (
-                                <div className="admin-empty" style={{ padding: '40px 0' }}>
+                                <div className="admin-empty">
                                     <i className="fas fa-users" />
                                     <p>No vendors registered yet</p>
                                 </div>
@@ -622,10 +637,10 @@ export default function AdminDashboard() {
                             )}
                         </div>
                     </>
-                )}
+                ) : null}
 
                 {/* ── INVENTORY TAB ── */}
-                {tab === 'inventory' && (
+                {tab === 'inventory' ? (
                     <>
                         <div className="admin-header">
                             <div>
@@ -637,32 +652,32 @@ export default function AdminDashboard() {
                             </button>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+                        <div className="admin-inventory-grid">
                             {inventory.map(item => {
                                 const usagePercent = item.total > 0 ? Math.round(((item.inUse || 0) / item.total) * 100) : 0
                                 const barColor = usagePercent > 80 ? '#dc3545' : usagePercent > 50 ? '#ffc107' : '#28a745'
                                 return (
-                                    <div key={item.id} className="admin-card" style={{ padding: 20 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                                            <div style={{ width: 40, height: 40, background: 'rgba(198,167,105,0.12)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C6A769', fontSize: '1rem' }}>
+                                    <div key={item.id} className="admin-inventory-card">
+                                        <div className="admin-inventory-header">
+                                            <div className="admin-inventory-icon">
                                                 <i className={item.icon} />
                                             </div>
-                                            <div>
-                                                <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{item.name}</div>
-                                                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{item.inUse || 0} / {item.total} in use</div>
+                                            <div className="admin-inventory-info">
+                                                <h4>{item.name}</h4>
+                                                <p>{item.inUse || 0} / {item.total} in use</p>
                                             </div>
                                         </div>
-                                        <div style={{ height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 3, overflow: 'hidden', marginBottom: 12 }}>
-                                            <div style={{ height: '100%', width: `${usagePercent}%`, background: barColor, borderRadius: 3, transition: 'width 0.4s' }} />
+                                        <div className="admin-inventory-bar-wrap">
+                                            <div className="admin-inventory-bar" style={{ width: `${usagePercent}%`, background: barColor }} />
                                         </div>
-                                        <div style={{ display: 'flex', gap: 8 }}>
-                                            <div className="admin-form-group" style={{ marginBottom: 0, flex: 1 }}>
-                                                <label style={{ fontSize: '0.65rem' }}>Total</label>
-                                                <input className="admin-input" type="number" min="0" value={item.total} onChange={e => updateInventoryItem(item.id, 'total', e.target.value)} style={{ padding: '6px 8px', fontSize: '0.82rem' }} />
+                                        <div className="admin-inventory-controls">
+                                            <div className="admin-inventory-field">
+                                                <label>Total</label>
+                                                <input type="number" min="0" value={item.total} onChange={e => updateInventoryItem(item.id, 'total', e.target.value)} />
                                             </div>
-                                            <div className="admin-form-group" style={{ marginBottom: 0, flex: 1 }}>
-                                                <label style={{ fontSize: '0.65rem' }}>In Use</label>
-                                                <input className="admin-input" type="number" min="0" max={item.total} value={item.inUse || 0} onChange={e => updateInventoryItem(item.id, 'inUse', e.target.value)} style={{ padding: '6px 8px', fontSize: '0.82rem' }} />
+                                            <div className="admin-inventory-field">
+                                                <label>In Use</label>
+                                                <input type="number" min="0" max={item.total} value={item.inUse || 0} onChange={e => updateInventoryItem(item.id, 'inUse', e.target.value)} />
                                             </div>
                                         </div>
                                     </div>
@@ -670,11 +685,11 @@ export default function AdminDashboard() {
                             })}
                         </div>
                     </>
-                )}
+                ) : null}
             </main>
 
             {/* ── MODAL: Add / Edit Booking ── */}
-            {modal && (
+            {modal ? (
                 <div className="admin-modal-overlay" onClick={() => setModal(null)}>
                     <div className="admin-modal" onClick={e => e.stopPropagation()}>
                         <div className="admin-modal-header">
@@ -755,7 +770,7 @@ export default function AdminDashboard() {
                         </form>
                     </div>
                 </div>
-            )}
+            ) : null}
         </div>
     )
 }

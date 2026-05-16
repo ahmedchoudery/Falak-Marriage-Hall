@@ -1,12 +1,17 @@
+'use client'
+
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
+import Link from 'next/link'
 
 export default function AdminLogin() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
-    const navigate = useNavigate()
+    const router = useRouter()
+    const { login } = useAuth()
 
     const handleLogin = async (e) => {
         e.preventDefault()
@@ -20,8 +25,8 @@ export default function AdminLogin() {
             })
             const data = await res.json()
             if (data.success) {
-                sessionStorage.setItem('adminToken', data.token)
-                navigate('/admin/dashboard')
+                login(data.token)
+                router.push('/admin/dashboard')
             } else {
                 setError(data.message || 'Invalid credentials.')
             }
@@ -64,13 +69,12 @@ export default function AdminLogin() {
                         />
                     </div>
 
-                    {error && <div className="admin-error"><i className="fas fa-exclamation-circle" /> {error}</div>}
+                    {error ? <div className="admin-error"><i className="fas fa-exclamation-circle" /> {error}</div> : null}
 
                     <button
                         type="submit"
                         className={`admin-btn-primary${loading ? ' is-loading' : ''}`}
                         disabled={loading}
-                        style={{ width: '100%', justifyContent: 'center', marginTop: 8 }}
                     >
                         {loading
                             ? <><i className="fas fa-circle-notch fa-spin" /> Verifying…</>
@@ -79,10 +83,10 @@ export default function AdminLogin() {
                     </button>
                 </form>
 
-                <div style={{ textAlign: 'center', marginTop: 28, paddingTop: 24, borderTop: '1px solid var(--gold-border)' }}>
-                    <a href="/" style={{ color: 'var(--gold)', fontSize: '0.8rem', opacity: 0.6, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                        <i className="fas fa-arrow-left" style={{ fontSize: '0.7rem' }} /> Back to Website
-                    </a>
+                <div className="admin-login-footer">
+                    <Link href="/" className="admin-back-link">
+                        <i className="fas fa-arrow-left" /> Back to Website
+                    </Link>
                 </div>
             </div>
         </div>

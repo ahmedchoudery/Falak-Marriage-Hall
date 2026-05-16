@@ -1,7 +1,9 @@
+'use client'
+
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import anime from 'animejs'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 export default function Hero() {
   const canvasRef = useRef(null)
@@ -146,7 +148,7 @@ export default function Hero() {
         <h1 className="hero-title">{chars}</h1>
         <p className="hero-subtitle">Where Beautiful Wedding Memories Begin</p>
         <div className="hero-btns">
-          <Link to="/booking" className="btn btn-gold">
+          <Link href="/booking" className="btn btn-gold">
             <i className="fas fa-calendar-check" /> Book Your Event
           </Link>
           <a href="#gallery" className="btn btn-outline">
