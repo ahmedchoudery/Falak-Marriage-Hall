@@ -2767,6 +2767,16 @@ select.admin-input option {
   line-height: 1.6;
 }
 
+.mb-gold {
+  color: var(--gold);
+}
+
+.menu-builder-section {
+  position: relative;
+  overflow-x: hidden;
+  width: 100%;
+}
+
 /* ── Package Selector ── */
 .mb-pkg-selector {
   display: grid;
@@ -2874,6 +2884,12 @@ select.admin-input option {
   grid-template-columns: 1fr 400px;
   gap: 40px;
   align-items: flex-start;
+  width: 100%;
+}
+
+.mb-dishes,
+.mb-summary {
+  min-width: 0;
 }
 
 /* ── Category Tabs ── */
@@ -3334,6 +3350,24 @@ select.admin-input option {
     gap: 50px;
   }
 
+  .mb-pkg-selector {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .mb-pkg-btn {
+    padding: 32px 24px;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  .mb-pkg-badge {
+    top: 10px;
+    right: -30px;
+    padding: 4px 35px;
+  }
+
   .mb-summary-card {
     position: static;
     max-width: 600px;
@@ -3342,20 +3376,12 @@ select.admin-input option {
 }
 
 @media (max-width: 768px) {
-  .mb-pkg-selector {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .mb-pkg-btn {
-    padding: 24px;
-    flex-direction: row;
-    justify-content: space-between;
-    text-align: left;
-  }
-
   .mb-pkg-name {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
+  }
+
+  .mb-pkg-price {
+    font-size: 0.95rem;
   }
 
   .mb-pkg-badge {
@@ -3379,9 +3405,34 @@ select.admin-input option {
   .mb-summary-card {
     padding: 30px 20px;
   }
-  
+
+  .mb-dish-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .mb-dish-info h4 {
+    font-size: 1rem;
+  }
+
+  .mb-dish-info p {
+    font-size: 0.8rem;
+  }
+
+  .mb-guest-slider-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .mb-guest-count {
+    text-align: center;
+    min-width: 0;
+  }
+
   .mb-cat-tabs {
     margin-bottom: 20px;
+    padding-bottom: 8px;
   }
 }
 
