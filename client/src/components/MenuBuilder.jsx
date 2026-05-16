@@ -70,64 +70,20 @@ const CATEGORIES = [
   },
 ]
 
-const PACKAGES = [
-  {
-    id: 'silver',
-    name: 'Silver',
-    tier: 'Standard',
-    basePrice: 1200,
-    perHead: 'per head',
-    includedDishes: 1,
-    desc: 'A dignified celebration with essential catering.',
-    defaults: ['m1', 'r1', 'r3', 'd1', 'b1'],
-  },
-  {
-    id: 'gold',
-    name: 'Gold',
-    tier: 'Premium',
-    basePrice: 1800,
-    perHead: 'per head',
-    includedDishes: 3,
-    desc: 'Our most popular — luxury catering with gourmet selections.',
-    defaults: ['s1', 'm1', 'm3', 'r1', 'r3', 'd1', 'b1'],
-    featured: true,
-    badge: 'Most Popular',
-  },
-  {
-    id: 'royal',
-    name: 'Royal',
-    tier: 'VIP Royal',
-    basePrice: 2800,
-    perHead: 'per head',
-    includedDishes: 5,
-    desc: 'An uncompromising royal feast for the finest celebrations.',
-    defaults: ['s1', 's2', 'm1', 'm2', 'm3', 'm7', 'r1', 'r2', 'r3', 'd1', 'd2', 'b1', 'b3'],
-  },
-]
-
 /* ── Helper: find item by ID ── */
 const allItems = CATEGORIES.flatMap(c => c.items)
 const findItem = (id) => allItems.find(i => i.id === id)
 
+const BASE_RATE = 1200 // Default base rate for custom menus
+const DEFAULT_ITEMS = ['m1', 'r1', 'r3', 'd1', 'b1']
+
 /* ── Component ──────────────────────────────────────────── */
 export default function MenuBuilder() {
   const [headRef, headVisible] = useReveal()
-  const [selectedPkg, setSelectedPkg] = useState('gold')
-  const [selectedItems, setSelectedItems] = useState(
-    () => new Set(PACKAGES.find(p => p.id === 'gold').defaults)
-  )
+  const [selectedItems, setSelectedItems] = useState(new Set(DEFAULT_ITEMS))
   const [guests, setGuests] = useState(300)
   const [activeCategory, setActiveCategory] = useState('mains')
   const [stickyVisible, setStickyVisible] = useState(false)
-
-  const pkg = PACKAGES.find(p => p.id === selectedPkg)
-
-  /* Switch package → reset to its defaults */
-  const selectPackage = (pkgId) => {
-    const p = PACKAGES.find(pp => pp.id === pkgId)
-    setSelectedPkg(pkgId)
-    setSelectedItems(new Set(p.defaults))
-  }
 
   /* Toggle a dish */
   const toggleItem = (itemId) => {
@@ -146,10 +102,10 @@ export default function MenuBuilder() {
       const item = findItem(id)
       if (item) extraPerHead += item.price
     })
-    const totalPerHead = pkg.basePrice + extraPerHead
+    const totalPerHead = BASE_RATE + extraPerHead
     const estimatedTotal = totalPerHead * guests
     return { extraPerHead, totalPerHead, estimatedTotal }
-  }, [selectedItems, pkg, guests])
+  }, [selectedItems, guests])
 
   const formatPrice = (n) => `PKR ${n.toLocaleString()}`
 
@@ -180,24 +136,8 @@ export default function MenuBuilder() {
           <h2>Interactive Menu Builder</h2>
           <div className="gold-divider" />
           <p className="menu-builder-subtitle">
-            Select a package, customize your dishes, and get an instant price estimate for your dream event.
+            Customize your dishes, and get an instant price estimate for your dream event.
           </p>
-        </div>
-
-        {/* ── Package Selector ── */}
-        <div className="mb-pkg-selector">
-          {PACKAGES.map(p => (
-            <button
-              key={p.id}
-              className={`mb-pkg-btn${selectedPkg === p.id ? ' active' : ''}${p.featured ? ' featured' : ''}`}
-              onClick={() => selectPackage(p.id)}
-            >
-              {p.badge && <span className="mb-pkg-badge">{p.badge}</span>}
-              <span className="mb-pkg-tier">{p.tier}</span>
-              <span className="mb-pkg-name">{p.name}</span>
-              <span className="mb-pkg-price">{formatPrice(p.basePrice)}<small>/{p.perHead}</small></span>
-            </button>
-          ))}
         </div>
 
         {/* ── Main Builder Area ── */}
@@ -220,7 +160,7 @@ export default function MenuBuilder() {
             <div className="mb-dish-grid">
               {CATEGORIES.find(c => c.id === activeCategory)?.items.map(item => {
                 const isSelected = selectedItems.has(item.id)
-                const isDefault = pkg.defaults.includes(item.id)
+                const isDefault = DEFAULT_ITEMS.includes(item.id)
                 return (
                   <button
                     key={item.id}
@@ -269,22 +209,14 @@ export default function MenuBuilder() {
                 </div>
               </div>
 
-              {/* Selected package */}
+              {/* Custom Menu Details */}
               <div className="mb-summary-details">
                 <div className="mb-summary-row">
-                  <span>Package</span>
-                  <strong className="mb-gold">{pkg.name}</strong>
+                  <span>Base Event Rate</span>
+                  <span>{formatPrice(BASE_RATE)} <small>/head</small></span>
                 </div>
                 <div className="mb-summary-row">
-                  <span>Tier</span>
-                  <span className="mb-tier-label">{pkg.tier}</span>
-                </div>
-                <div className="mb-summary-row">
-                  <span>Base Rate</span>
-                  <span>{formatPrice(pkg.basePrice)} <small>/head</small></span>
-                </div>
-                <div className="mb-summary-row">
-                  <span>Add-ons</span>
+                  <span>Custom Add-ons</span>
                   <span>{pricing.extraPerHead > 0 ? `+${formatPrice(pricing.extraPerHead)}` : 'Included'}</span>
                 </div>
 
