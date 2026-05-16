@@ -56,6 +56,14 @@ app.get('/assets/:file', (req, res, next) => {
         res.sendFile(filePath);
     } else { next(); }
 });
+// Ensure Service Worker is NEVER cached by the browser
+app.get('/sw.js', (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.sendFile(path.resolve(process.cwd(), 'dist', 'sw.js'));
+});
+
 // Static assets — disable default index serving to prevent cache interception
 app.use(express.static(path.resolve(process.cwd(), 'dist'), { index: false }));
 
