@@ -23,7 +23,7 @@ const packages = [
     features: [
       'Luxury floral decoration',
       'Professional lighting setup',
-      'Full AC hall for 500 guests',
+      'Full AC hall for 1000 guests',
       'Gourmet 3-dish catering',
       'Sound & DJ management',
       'Dedicated event manager',

@@ -258,7 +258,7 @@ export default function BookingPage() {
                     <input
                       type="number"
                       className="form-control"
-                      placeholder="e.g. 500"
+                      placeholder="e.g. 1000"
                       min="1"
                       value={form.guests}
                       onChange={e => set('guests', e.target.value)}

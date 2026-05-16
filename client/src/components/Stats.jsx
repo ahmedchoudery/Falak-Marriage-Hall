@@ -1,7 +1,7 @@
 import { useCounter, useReveal } from '../hooks/useReveal'
 
 const stats = [
-  { icon: 'fas fa-users',          target: 500,  suffix: '+', label: 'Guest Capacity'   },
+  { icon: 'fas fa-users',          target: 1000, suffix: '+', label: 'Guest Capacity'   },
   { icon: 'fas fa-calendar-check', target: 1500, suffix: '+', label: 'Events Completed' },
   { icon: 'fas fa-car',            target: 200,  suffix: '+', label: 'Parking Spaces'   },
   { icon: 'fas fa-snowflake',      target: 100,  suffix: '%', label: 'AC Coverage'      },
