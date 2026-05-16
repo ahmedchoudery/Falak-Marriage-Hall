@@ -118,6 +118,7 @@ export default function MenuBuilder() {
   )
   const [guests, setGuests] = useState(300)
   const [activeCategory, setActiveCategory] = useState('mains')
+  const [stickyVisible, setStickyVisible] = useState(false)
 
   const pkg = PACKAGES.find(p => p.id === selectedPkg)
 
@@ -151,6 +152,21 @@ export default function MenuBuilder() {
   }, [selectedItems, pkg, guests])
 
   const formatPrice = (n) => `PKR ${n.toLocaleString()}`
+
+  /* ── Mobile Sticky Visibility ── */
+  useState(() => {
+    const handleScroll = () => {
+      const section = document.getElementById('menu-builder')
+      if (!section) return
+      
+      const rect = section.getBoundingClientRect()
+      const isVisible = rect.top < window.innerHeight && rect.bottom > 100
+      setStickyVisible(isVisible)
+    }
+    
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
     <section id="menu-builder" className="menu-builder-section">
@@ -254,42 +270,52 @@ export default function MenuBuilder() {
               </div>
 
               {/* Selected package */}
-              <div className="mb-summary-row">
-                <span>Package</span>
-                <strong className="mb-gold">{pkg.name} ({pkg.tier})</strong>
-              </div>
-              <div className="mb-summary-row">
-                <span>Base Rate</span>
-                <span>{formatPrice(pkg.basePrice)} /head</span>
-              </div>
-              <div className="mb-summary-row">
-                <span>Add-ons</span>
-                <span>{pricing.extraPerHead > 0 ? `+${formatPrice(pricing.extraPerHead)}` : '—'}</span>
-              </div>
+              <div className="mb-summary-details">
+                <div className="mb-summary-row">
+                  <span>Package</span>
+                  <strong className="mb-gold">{pkg.name}</strong>
+                </div>
+                <div className="mb-summary-row">
+                  <span>Tier</span>
+                  <span className="mb-tier-label">{pkg.tier}</span>
+                </div>
+                <div className="mb-summary-row">
+                  <span>Base Rate</span>
+                  <span>{formatPrice(pkg.basePrice)} <small>/head</small></span>
+                </div>
+                <div className="mb-summary-row">
+                  <span>Add-ons</span>
+                  <span>{pricing.extraPerHead > 0 ? `+${formatPrice(pricing.extraPerHead)}` : 'Included'}</span>
+                </div>
 
-              <div className="mb-summary-divider" />
+                <div className="mb-summary-divider" />
 
-              <div className="mb-summary-row mb-total-row">
-                <span>Total / Head</span>
-                <strong className="mb-gold">{formatPrice(pricing.totalPerHead)}</strong>
+                <div className="mb-summary-row mb-total-row">
+                  <span>Total / Head</span>
+                  <strong className="mb-gold">{formatPrice(pricing.totalPerHead)}</strong>
+                </div>
               </div>
 
               <div className="mb-summary-grand">
-                <span>Estimated Grand Total</span>
-                <strong>{formatPrice(pricing.estimatedTotal)}</strong>
+                <span className="mb-grand-label">Estimated Grand Total</span>
+                <strong className="mb-grand-price">{formatPrice(pricing.estimatedTotal)}</strong>
               </div>
 
               {/* Selected dishes list */}
               <div className="mb-selected-list">
-                <h4>{selectedItems.size} dishes selected</h4>
+                <div className="mb-list-header">
+                  <h4>Selected Dishes</h4>
+                  <span className="mb-dish-count">{selectedItems.size}</span>
+                </div>
                 <ul>
                   {[...selectedItems].map(id => {
                     const item = findItem(id)
                     return item ? (
                       <li key={id}>
+                        <i className="fas fa-check" />
                         <span>{item.name}</span>
                         <span className="mb-dish-li-price">
-                          {item.price === 0 ? 'Included' : `+${formatPrice(item.price)}`}
+                          {item.price === 0 ? 'Inc.' : `+${item.price}`}
                         </span>
                       </li>
                     ) : null
@@ -301,14 +327,26 @@ export default function MenuBuilder() {
                 to="/booking"
                 className="btn btn-gold mb-book-btn"
               >
-                <i className="fas fa-calendar-check" /> Book This Menu
+                <span>Book This Menu</span>
+                <i className="fas fa-arrow-right" />
               </Link>
 
               <p className="mb-disclaimer">
-                * Prices are estimates. Final pricing confirmed after consultation with our events team.
+                * Prices are estimates. Final pricing confirmed after consultation.
               </p>
             </div>
           </div>
+        </div>
+
+        {/* ── Mobile Sticky Total ── */}
+        <div className={`mb-mobile-sticky ${stickyVisible ? 'visible' : ''}`}>
+          <div className="mb-sticky-info">
+            <span className="mb-sticky-label">Estimated Total</span>
+            <span className="mb-sticky-price">{formatPrice(pricing.estimatedTotal)}</span>
+          </div>
+          <Link to="/booking" className="mb-sticky-btn">
+            Book Now
+          </Link>
         </div>
       </div>
     </section>
