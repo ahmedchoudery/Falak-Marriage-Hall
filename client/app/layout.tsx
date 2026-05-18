@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const cormorant = Cormorant_Garamond({
+const outfit = Outfit({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-display",
 });
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-body",
 });
 
@@ -43,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${inter.variable}`}>
       <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
       </head>
