@@ -1,22 +1,28 @@
 {
-    "version": 2,
-    "builds": [
+  "functions": {
+    "server.js": {
+      "includeFiles": "dist/**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/server.js"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
         {
-            "src": "server.js",
-            "use": "@vercel/node",
-            "config": {
-                "includeFiles": "dist/**"
-            }
-        }
-    ],
-    "routes": [
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
         {
-            "src": "/(.*)",
-            "dest": "server.js",
-            "headers": {
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache"
-            }
+          "key": "Pragma",
+          "value": "no-cache"
         }
-    ]
+      ]
+    }
+  ]
 }
