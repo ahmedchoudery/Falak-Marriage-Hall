@@ -45,27 +45,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Manual Asset Routing
-app.get('/assets/:file', (req, res, next) => {
-    const filePath = path.join(process.cwd(), 'dist', 'assets', req.params.file);
-    if (fs.existsSync(filePath)) {
-        if (req.params.file.endsWith('.js')) res.setHeader('Content-Type', 'application/javascript');
-        if (req.params.file.endsWith('.css')) res.setHeader('Content-Type', 'text/css');
-        // Assets with hashes can be cached!
-        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-        res.sendFile(filePath);
-    } else { next(); }
-});
-// Ensure Service Worker is NEVER cached by the browser
-app.get('/sw.js', (req, res) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.sendFile(path.resolve(process.cwd(), 'dist', 'sw.js'));
+// Health check root route
+app.get('/', (req, res) => {
+    res.json({ success: true, service: 'Falak Marriage Hall API', status: 'operational' });
 });
 
-// Static assets — disable default index serving to prevent cache interception
-app.use(express.static(path.resolve(process.cwd(), 'dist'), { index: false }));
 
 // MongoDB
 let cachedDb = null;
@@ -367,13 +351,9 @@ app.post('/api/admin/availability/sync', adminAuth, async (req, res) => {
     } catch (error) { res.status(500).json({ success: false, message: 'Sync failed.' }); }
 });
 
-// SPA fallback — disable caching and ETags for index.html to force 200 OK
-app.get('*', (req, res) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.setHeader('Surrogate-Control', 'no-store');
-    res.sendFile(path.resolve(process.cwd(), 'dist', 'index.html'), { etag: false, lastModified: false });
+// Fallback 404 for unmatched routes
+app.use((req, res) => {
+    res.status(404).json({ success: false, message: 'Resource not found' });
 });
 
 if (process.env.NODE_ENV !== 'production') {
