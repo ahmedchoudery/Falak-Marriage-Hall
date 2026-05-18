@@ -8,13 +8,10 @@ const nextConfig = {
   reactStrictMode: true,
   // Silence the multiple-lockfiles workspace root warning
   outputFileTracingRoot: __dirname,
+  output: 'export',
+  trailingSlash: true,
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
+    unoptimized: true,
   },
 };
 

@@ -45,8 +45,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check root route
-app.get('/', (req, res) => {
+// Serve static frontend files (Next.js static export build)
+app.use(express.static(path.resolve(process.cwd(), 'dist')));
+
+// API Health check endpoint
+app.get('/api/health', (req, res) => {
     res.json({ success: true, service: 'Falak Marriage Hall API', status: 'operational' });
 });
 
@@ -351,9 +354,14 @@ app.post('/api/admin/availability/sync', adminAuth, async (req, res) => {
     } catch (error) { res.status(500).json({ success: false, message: 'Sync failed.' }); }
 });
 
-// Fallback 404 for unmatched routes
-app.use((req, res) => {
-    res.status(404).json({ success: false, message: 'Resource not found' });
+// Wildcard fallback router
+app.get('*', (req, res) => {
+    // Return standard JSON 404 for API requests
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ success: false, message: 'Resource not found' });
+    }
+    // Serve the Next.js static 404 page for all frontend routes
+    res.status(404).sendFile(path.resolve(process.cwd(), 'dist', '404', 'index.html'));
 });
 
 if (process.env.NODE_ENV !== 'production') {
