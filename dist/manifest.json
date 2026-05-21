@@ -1,0 +1,27 @@
+{
+  "name": "Falak Marriage Hall",
+  "short_name": "Falak Hall",
+  "description": "Gujrat's Most Premium Wedding Venue — Book your dream event at Falak Hall & Events.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060E0C",
+  "theme_color": "#C6A769",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon_new.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon_new.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr"
+}
