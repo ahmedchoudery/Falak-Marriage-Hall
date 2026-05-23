@@ -19,11 +19,19 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: "Falak Marriage Hall | Luxury Wedding Venue Gujrat",
-  description: "Falak Marriage Hall – The most elegant and luxury wedding venue in Gujrat, Punjab. Premium catering, professional decoration, royal ambience. Book your dream event today.",
-  keywords: ["marriage hall Gujrat", "wedding venue Gujrat", "Falak Marriage Hall", "luxury wedding hall Punjab", "GT Road Gujrat"],
+  description:
+    "Falak Marriage Hall – The most elegant and luxury wedding venue in Gujrat, Punjab. Premium catering, professional decoration, royal ambience. Book your dream event today.",
+  keywords: [
+    "marriage hall Gujrat",
+    "wedding venue Gujrat",
+    "Falak Marriage Hall",
+    "luxury wedding hall Punjab",
+    "GT Road Gujrat",
+  ],
   openGraph: {
     title: "Falak Marriage Hall | Luxury Wedding Venue Gujrat",
-    description: "Host your dream wedding at Gujrat's most premium marriage hall. 1000+ guests, gourmet catering, royal decor.",
+    description:
+      "Host your dream wedding at Gujrat's most premium marriage hall. 1000+ guests, gourmet catering, royal decor.",
     url: "https://falak-marriage-hall.vercel.app/",
     siteName: "Falak Marriage Hall",
     images: [
@@ -46,9 +54,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${cormorant.variable} ${dmSans.variable}`}>
       <head>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        />
       </head>
-      <body>
+      {/*
+        suppressHydrationWarning prevents false hydration mismatches caused
+        by browser extensions (e.g. Grammarly) that inject attributes like
+        data-gr-ext-installed into <body> after SSR.
+      */}
+      <body suppressHydrationWarning>
         <Navbar />
         <main>{children}</main>
         <Footer />

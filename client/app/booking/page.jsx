@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import anime from 'animejs'
 import { useReveal } from '@/hooks/useReveal'
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || ''
+
 const eventTypes = [
   'Wedding (Nikah)',
   'Walima / Reception',
@@ -69,7 +71,7 @@ export default function BookingPage() {
     setLoading(true)
 
     try {
-      const res = await fetch('/api/booking', {
+      const res = await fetch(`${API_BASE}/api/booking`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -78,8 +80,7 @@ export default function BookingPage() {
 
       if (res.ok && data.success) {
         setSubmitted(true)
-        
-        // Construct WhatsApp message
+
         const waMsg = encodeURIComponent(
           `Hi, I just submitted a booking inquiry on your website!\n\n` +
           `*Name:* ${form.name}\n` +
@@ -88,13 +89,9 @@ export default function BookingPage() {
           `*Guests:* ${form.guests}\n` +
           `*Phone:* ${form.phone}\n` +
           (form.message ? `*Notes:* ${form.message}` : '')
-        );
-        const waUrl = `https://wa.me/923086891083?text=${waMsg}`;
-        
-        // Automatically trigger WhatsApp in a new tab
-        window.open(waUrl, '_blank');
+        )
+        window.open(`https://wa.me/923086891083?text=${waMsg}`, '_blank')
 
-        // Animate success icon
         setTimeout(() => {
           anime({
             targets: '.form-success-icon',
@@ -114,10 +111,8 @@ export default function BookingPage() {
     }
   }
 
-  // Set minimum date to today
   const today = new Date().toISOString().split('T')[0]
 
-  // Page entrance animation
   useEffect(() => {
     anime({
       targets: '.booking-page-title .char',
@@ -137,31 +132,22 @@ export default function BookingPage() {
 
   return (
     <div className="booking-page">
-      {/* Hero Header */}
       <div className="booking-hero">
         <div className="booking-hero-pattern" />
         <div className="container">
-          <span className="section-label">
-            Reserve Your Date
-          </span>
-          <h1 className="booking-page-title">
-            {titleChars}
-          </h1>
+          <span className="section-label">Reserve Your Date</span>
+          <h1 className="booking-page-title">{titleChars}</h1>
           <p className="booking-hero-subtitle">
             Fill in the form below and our team will contact you within 24 hours.
           </p>
         </div>
       </div>
 
-      {/* Form + Info grid */}
       <div className="container booking-container">
         <div className="booking-grid">
 
           {/* ── Form ── */}
-          <div
-            ref={formRef}
-            className={`booking-form-wrap reveal-left${formVisible ? ' visible' : ''}`}
-          >
+          <div ref={formRef} className={`booking-form-wrap reveal-left${formVisible ? ' visible' : ''}`}>
             {submitted ? (
               <div className="form-success">
                 <div className="form-success-icon">
@@ -171,21 +157,18 @@ export default function BookingPage() {
                   Booking Inquiry Submitted!
                 </h3>
                 <p style={{ color: 'var(--text-muted)', marginBottom: 32, fontSize: '0.95rem' }}>
-                  We'll contact you any minute now on <strong style={{ color: 'var(--gold)' }}>{form.phone}</strong> to confirm your details.
+                  We'll contact you any minute now on{' '}
+                  <strong style={{ color: 'var(--gold)' }}>{form.phone}</strong> to confirm your details.
                 </p>
-                {/* Dynamic WhatsApp Confirmation */}
-                <a 
+                <a
                   href={`https://wa.me/923086891083?text=${encodeURIComponent(
                     `Hi, I just submitted a booking inquiry on your website!\n\n` +
-                    `*Name:* ${form.name}\n` +
-                    `*Date:* ${form.eventDate}\n` +
-                    `*Event:* ${form.eventType}\n` +
-                    `*Guests:* ${form.guests}\n` +
-                    `*Phone:* ${form.phone}\n` +
+                    `*Name:* ${form.name}\n*Date:* ${form.eventDate}\n*Event:* ${form.eventType}\n` +
+                    `*Guests:* ${form.guests}\n*Phone:* ${form.phone}\n` +
                     (form.message ? `*Notes:* ${form.message}` : '')
-                  )}`} 
-                  target="_blank" 
-                  rel="noreferrer" 
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer"
                   className="btn btn-gold"
                   style={{ background: '#25d366', borderColor: '#25d366', color: 'white' }}
                 >
@@ -194,93 +177,55 @@ export default function BookingPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate>
-                <h3 className="form-header">
-                  Event Details
-                </h3>
+                <h3 className="form-header">Event Details</h3>
 
                 <FormField label="Full Name" required error={errors.name}>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="e.g. Muhammad Ahmed"
-                    value={form.name}
-                    onChange={e => set('name', e.target.value)}
-                  />
+                  <input type="text" className="form-control" placeholder="e.g. Muhammad Ahmed"
+                    value={form.name} onChange={e => set('name', e.target.value)} />
                 </FormField>
 
                 <div className="form-row">
                   <FormField label="Phone Number" required error={errors.phone}>
-                    <input
-                      type="tel"
-                      className="form-control"
-                      placeholder="03xx-xxxxxxx"
-                      value={form.phone}
-                      onChange={e => set('phone', e.target.value)}
-                    />
+                    <input type="tel" className="form-control" placeholder="03xx-xxxxxxx"
+                      value={form.phone} onChange={e => set('phone', e.target.value)} />
                   </FormField>
                   <FormField label="Email Address" error={errors.email}>
-                    <input
-                      type="email"
-                      className="form-control"
-                      placeholder="optional"
-                      value={form.email}
-                      onChange={e => set('email', e.target.value)}
-                    />
+                    <input type="email" className="form-control" placeholder="optional"
+                      value={form.email} onChange={e => set('email', e.target.value)} />
                   </FormField>
                 </div>
 
                 <div className="form-row">
                   <FormField label="Event Date" required error={errors.eventDate}>
-                    <input
-                      type="date"
-                      className="form-control"
-                      min={today}
-                      value={form.eventDate}
-                      onChange={e => set('eventDate', e.target.value)}
-                    />
+                    <input type="date" className="form-control" min={today}
+                      value={form.eventDate} onChange={e => set('eventDate', e.target.value)} />
                   </FormField>
                   <FormField label="Estimated Guests" required error={errors.guests}>
-                    <input
-                      type="number"
-                      className="form-control"
-                      placeholder="e.g. 1000"
-                      min="1"
-                      value={form.guests}
-                      onChange={e => set('guests', e.target.value)}
-                    />
+                    <input type="number" className="form-control" placeholder="e.g. 1000" min="1"
+                      value={form.guests} onChange={e => set('guests', e.target.value)} />
                   </FormField>
                 </div>
 
                 <div className="form-row">
                   <FormField label="Event Type" required error={errors.eventType}>
-                    <select
-                      className="form-control"
-                      value={form.eventType}
-                      onChange={e => set('eventType', e.target.value)}
-                    >
+                    <select className="form-control" value={form.eventType}
+                      onChange={e => set('eventType', e.target.value)}>
                       <option value="">Select event type…</option>
                       {eventTypes.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
                   </FormField>
                   <FormField label="Preferred Hall" error={errors.hall}>
-                    <select
-                      className="form-control"
-                      value={form.hall}
-                      onChange={e => set('hall', e.target.value)}
-                    >
+                    <select className="form-control" value={form.hall}
+                      onChange={e => set('hall', e.target.value)}>
                       {halls.map(h => <option key={h} value={h}>{h}</option>)}
                     </select>
                   </FormField>
                 </div>
 
                 <FormField label="Your Requirements / Message" error={errors.message}>
-                  <textarea
-                    className="form-control"
-                    rows={5}
+                  <textarea className="form-control" rows={5}
                     placeholder="Tell us about your theme preferences, catering needs, special requests…"
-                    value={form.message}
-                    onChange={e => set('message', e.target.value)}
-                  />
+                    value={form.message} onChange={e => set('message', e.target.value)} />
                 </FormField>
 
                 <button
@@ -288,15 +233,14 @@ export default function BookingPage() {
                   className={`btn btn-gold btn-booking-submit${loading ? ' is-loading' : ''}`}
                   disabled={loading}
                 >
-                  {loading ? (
-                    <><i className="fas fa-circle-notch fa-spin" /> Submitting…</>
-                  ) : (
-                    <><i className="fas fa-lock" /> Secure Booking Inquiry</>
-                  )}
+                  {loading
+                    ? <><i className="fas fa-circle-notch fa-spin" /> Submitting…</>
+                    : <><i className="fas fa-lock" /> Secure Booking Inquiry</>
+                  }
                 </button>
 
                 <p className="booking-disclaimer">
-                  We'll call you on your given Contact. We'll confirm within 24 hours. For urgent booking, call{' '}
+                  We'll call you on your given contact. We'll confirm within 24 hours. For urgent booking, call{' '}
                   <a href="tel:+923086891083">0308-6891083</a>
                 </p>
               </form>
@@ -304,14 +248,12 @@ export default function BookingPage() {
           </div>
 
           {/* ── Info Panel ── */}
-          <div
-            ref={infoRef}
-            className={`booking-info reveal-right${infoVisible ? ' visible' : ''}`}
-          >
+          <div ref={infoRef} className={`booking-info reveal-right${infoVisible ? ' visible' : ''}`}>
             <div className="booking-trust-seal">
               <i className="fas fa-shield-halved" />
               <span>Certified Royal Venue</span>
             </div>
+
             <div className="booking-info-card">
               <h3>Premium Experience</h3>
               <div className="info-feature">
@@ -346,31 +288,20 @@ export default function BookingPage() {
 
             <div className="booking-info-card">
               <h3>Quick Contact</h3>
-              <a
-                href="tel:+923086891083"
-                className="btn btn-gold btn-booking-call"
-              >
+              <a href="tel:+923086891083" className="btn btn-gold btn-booking-call">
                 <i className="fas fa-phone" /> Call: 0308-6891083
               </a>
-              <a
-                href="https://wa.me/923086891083"
-                target="_blank"
-                rel="noreferrer"
+              <a href="https://wa.me/923086891083" target="_blank" rel="noreferrer"
                 className="btn"
-                style={{ width: '100%', justifyContent: 'center', background: '#25d366', borderColor: '#25d366', color: 'white' }}
-              >
+                style={{ width: '100%', justifyContent: 'center', background: '#25d366', borderColor: '#25d366', color: 'white' }}>
                 <i className="fab fa-whatsapp" /> WhatsApp Chat
               </a>
             </div>
 
             <div className="booking-info-card quote-card">
-              <p>
-                "Submit your inquiry above and our event experts will contact you within 24 hours to plan your perfect day."
-              </p>
+              <p>"Submit your inquiry above and our event experts will contact you within 24 hours to plan your perfect day."</p>
               <div className="quote-author">
-                <span>
-                  — Falak Hall & Events Team
-                </span>
+                <span>— Falak Hall & Events Team</span>
               </div>
             </div>
           </div>

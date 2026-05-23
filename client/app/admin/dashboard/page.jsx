@@ -4,81 +4,79 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || ''
+
 // ── helpers ────────────────────────────────────────────────────────────────
 const STATUS_COLORS = {
-    pending: { bg: 'rgba(229, 193, 126, 0.15)', color: '#E5C17E', label: 'Pending' },
-    approved: { bg: 'rgba(52, 211, 153, 0.15)', color: '#34D399', label: 'Approved' },
-    rejected: { bg: 'rgba(239, 68, 68, 0.15)', color: '#EF4444', label: 'Rejected' },
-    manual: { bg: 'rgba(229, 193, 126, 0.15)', color: '#E5C17E', label: 'Manual' },
+  pending:  { label: 'Pending' },
+  approved: { label: 'Approved' },
+  rejected: { label: 'Rejected' },
+  manual:   { label: 'Manual' },
 }
 
 const SOURCE_BADGE = {
-    online: { bg: 'rgba(59, 130, 246, 0.15)', color: '#3B82F6', label: 'Online' },
-    manual: { bg: 'rgba(229, 193, 126, 0.15)', color: '#E5C17E', label: 'Manual' },
+  online: { label: 'Online' },
+  manual: { label: 'Manual' },
 }
 
 function StatusPill({ status }) {
-    return (
-        <span className={`admin-pill admin-pill-${status}`}>
-            {STATUS_COLORS[status]?.label || 'Pending'}
-        </span>
-    )
+  return (
+    <span className={`admin-pill admin-pill-${status}`}>
+      {STATUS_COLORS[status]?.label || 'Pending'}
+    </span>
+  )
 }
 
 function SourcePill({ source }) {
-    return (
-        <span className={`admin-pill admin-pill-${source}`}>
-            {SOURCE_BADGE[source]?.label || 'Online'}
-        </span>
-    )
+  return (
+    <span className={`admin-pill admin-pill-${source}`}>
+      {SOURCE_BADGE[source]?.label || 'Online'}
+    </span>
+  )
 }
 
 const BLANK_FORM = {
-    name: '', phone: '', email: '', eventDate: '',
-    eventType: '', hall: 'Any Available', guests: '', message: '', status: 'approved',
+  name: '', phone: '', email: '', eventDate: '',
+  eventType: '', hall: 'Any Available', guests: '', message: '', status: 'approved',
 }
 
 const EVENT_TYPES = ['Wedding (Nikah)', 'Walima / Reception', 'Mehndi Night', 'Birthday Party', 'Corporate Event', 'Other']
 const HALLS = ['Main Grand Hall', 'Garden Terrace', 'Any Available']
-
 const VENDOR_ROLES = ['Caterer', 'Decorator', 'Photographer', 'Videographer', 'DJ / Sound', 'Lighting', 'Valet', 'Coordinator']
+
 const INVENTORY_DEFAULTS = [
-    { id: 'chairs', name: 'Chairs', total: 600, icon: 'fas fa-chair' },
-    { id: 'tables', name: 'Round Tables', total: 60, icon: 'fas fa-table' },
-    { id: 'tablecloths', name: 'Table Cloths', total: 80, icon: 'fas fa-scroll' },
-    { id: 'crockery', name: 'Crockery Sets', total: 700, icon: 'fas fa-utensils' },
-    { id: 'glass', name: 'Glassware Sets', total: 500, icon: 'fas fa-wine-glass-alt' },
-    { id: 'lights', name: 'Light Fixtures', total: 200, icon: 'fas fa-lightbulb' },
-    { id: 'speakers', name: 'Speakers', total: 12, icon: 'fas fa-volume-up' },
-    { id: 'stage', name: 'Stage Panels', total: 24, icon: 'fas fa-border-all' },
-    { id: 'ac', name: 'AC Units', total: 16, icon: 'fas fa-snowflake' },
-    { id: 'generators', name: 'Generators', total: 3, icon: 'fas fa-bolt' },
+  { id: 'chairs',      name: 'Chairs',         total: 600, icon: 'fas fa-chair' },
+  { id: 'tables',      name: 'Round Tables',   total: 60,  icon: 'fas fa-table' },
+  { id: 'tablecloths', name: 'Table Cloths',   total: 80,  icon: 'fas fa-scroll' },
+  { id: 'crockery',    name: 'Crockery Sets',  total: 700, icon: 'fas fa-utensils' },
+  { id: 'glass',       name: 'Glassware Sets', total: 500, icon: 'fas fa-wine-glass-alt' },
+  { id: 'lights',      name: 'Light Fixtures', total: 200, icon: 'fas fa-lightbulb' },
+  { id: 'speakers',    name: 'Speakers',       total: 12,  icon: 'fas fa-volume-up' },
+  { id: 'stage',       name: 'Stage Panels',   total: 24,  icon: 'fas fa-border-all' },
+  { id: 'ac',          name: 'AC Units',       total: 16,  icon: 'fas fa-snowflake' },
+  { id: 'generators',  name: 'Generators',     total: 3,   icon: 'fas fa-bolt' },
 ]
 
-// ── PDF Invoice Generator (opens print dialog) ─────────────────────────────
+// ── Invoice generator ──────────────────────────────────────────────────────
 function generateInvoice(booking) {
-    const invoiceDate = new Date().toLocaleDateString('en-PK', { year: 'numeric', month: 'long', day: 'numeric' })
-    const invoiceNo = `FH-${Date.now().toString(36).toUpperCase()}`
-    const win = window.open('', '_blank', 'width=800,height=900')
-    win.document.write(`
-<!DOCTYPE html>
-<html><head><title>Invoice ${invoiceNo}</title>
+  const invoiceDate = new Date().toLocaleDateString('en-PK', { year: 'numeric', month: 'long', day: 'numeric' })
+  const invoiceNo   = `FH-${Date.now().toString(36).toUpperCase()}`
+  const win = window.open('', '_blank', 'width=800,height=900')
+  win.document.write(`<!DOCTYPE html><html><head><title>Invoice ${invoiceNo}</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: 'Segoe UI', sans-serif; background:#fff; color:#222; padding:40px; }
-  .inv-header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #C6A769; padding-bottom:20px; margin-bottom:30px; }
-  .inv-logo { font-size:28px; font-weight:700; color:#0A1A15; }
-  .inv-logo small { display:block; font-size:11px; color:#888; font-weight:400; letter-spacing:2px; text-transform:uppercase; }
-  .inv-info { text-align:right; font-size:13px; color:#555; }
-  .inv-info strong { color:#222; }
-  .inv-title { font-size:18px; font-weight:700; color:#C6A769; text-transform:uppercase; letter-spacing:3px; margin-bottom:24px; }
-  .inv-table { width:100%; border-collapse:collapse; margin-bottom:24px; }
-  .inv-table th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#888; padding:8px 12px; border-bottom:1px solid #ddd; }
-  .inv-table td { padding:10px 12px; border-bottom:1px solid #eee; font-size:14px; }
-  .inv-footer { margin-top:40px; padding-top:20px; border-top:2px solid #C6A769; text-align:center; font-size:12px; color:#888; }
-  .inv-footer strong { color:#C6A769; }
-  .inv-note { background:#f9f6f0; border-left:4px solid #C6A769; padding:16px; margin:24px 0; font-size:13px; color:#555; }
-  @media print { body { padding:20px; } }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',sans-serif;background:#fff;color:#222;padding:40px}
+  .inv-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #C6A769;padding-bottom:20px;margin-bottom:30px}
+  .inv-logo{font-size:28px;font-weight:700;color:#0A1A15}
+  .inv-logo small{display:block;font-size:11px;color:#888;font-weight:400;letter-spacing:2px;text-transform:uppercase}
+  .inv-info{text-align:right;font-size:13px;color:#555}
+  .inv-title{font-size:18px;font-weight:700;color:#C6A769;text-transform:uppercase;letter-spacing:3px;margin-bottom:24px}
+  .inv-table{width:100%;border-collapse:collapse;margin-bottom:24px}
+  .inv-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;padding:8px 12px;border-bottom:1px solid #ddd}
+  .inv-table td{padding:10px 12px;border-bottom:1px solid #eee;font-size:14px}
+  .inv-footer{margin-top:40px;padding-top:20px;border-top:2px solid #C6A769;text-align:center;font-size:12px;color:#888}
+  .inv-note{background:#f9f6f0;border-left:4px solid #C6A769;padding:16px;margin:24px 0;font-size:13px;color:#555}
+  @media print{body{padding:20px}}
 </style></head><body>
   <div class="inv-header">
     <div class="inv-logo">FALAK HALL<small>Marriage Hall & Events</small></div>
@@ -102,675 +100,566 @@ function generateInvoice(booking) {
       ${booking.message ? `<tr><td>Special Requirements</td><td>${booking.message}</td></tr>` : ''}
     </tbody>
   </table>
-  <div class="inv-note">
-    <strong>Note:</strong> Final pricing will be confirmed during consultation. Use our online Menu Builder at falak-marriage-hall.vercel.app for instant estimates.
-  </div>
+  <div class="inv-note"><strong>Note:</strong> Final pricing will be confirmed during consultation.</div>
   <div class="inv-footer">
     <strong>Falak Marriage Hall</strong> — GT Road, Service Mor, Gujrat 50700, Punjab<br/>
     Phone: 0308-6891083 | Email: info@falakhall.com<br/><br/>
     Thank you for choosing Falak Hall & Events!
   </div>
 </body></html>`)
-    win.document.close()
-    setTimeout(() => win.print(), 300)
+  win.document.close()
+  setTimeout(() => win.print(), 300)
 }
 
-// ── main component ─────────────────────────────────────────────────────────
+// ── Main component ─────────────────────────────────────────────────────────
 export default function AdminDashboard() {
-    const router = useRouter()
-    
-    const [token, setToken] = useState(null)
-    const [tab, setTab] = useState('bookings')   // bookings | availability | vendors | inventory
-    const [filter, setFilter] = useState('all')
-    const [bookings, setBookings] = useState([])
-    const [availability, setAvailability] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [toast, setToast] = useState(null)
+  const router = useRouter()
 
-    // Modal state
-    const [modal, setModal] = useState(null)          // null | 'add' | 'edit'
-    const [editTarget, setEditTarget] = useState(null)
-    const [form, setForm] = useState(BLANK_FORM)
-    const [formLoading, setFormLoading] = useState(false)
+  const [token, setToken]               = useState(null)
+  const [tab, setTab]                   = useState('bookings')
+  const [filter, setFilter]             = useState('all')
+  const [bookings, setBookings]         = useState([])
+  const [availability, setAvailability] = useState([])
+  const [loading, setLoading]           = useState(true)
+  const [toast, setToast]               = useState(null)
 
-    // Availability block date
-    const [blockDate, setBlockDate] = useState('')
+  const [modal, setModal]               = useState(null)
+  const [editTarget, setEditTarget]     = useState(null)
+  const [form, setForm]                 = useState(BLANK_FORM)
+  const [formLoading, setFormLoading]   = useState(false)
 
-    // Vendors (localStorage)
-    const [vendors, setVendors] = useState([])
-    const [vendorForm, setVendorForm] = useState({ name: '', role: '', phone: '', note: '' })
+  const [blockDate, setBlockDate]       = useState('')
+  const [vendors, setVendors]           = useState([])
+  const [vendorForm, setVendorForm]     = useState({ name: '', role: '', phone: '', note: '' })
+  const [inventory, setInventory]       = useState(INVENTORY_DEFAULTS)
 
-    // Inventory (localStorage)
-    const [inventory, setInventory] = useState(INVENTORY_DEFAULTS)
+  useEffect(() => {
+    setToken(sessionStorage.getItem('adminToken'))
+    try { const v = JSON.parse(localStorage.getItem('falak_vendors')); if (v) setVendors(v) } catch {}
+    try { const i = JSON.parse(localStorage.getItem('falak_inventory')); if (i) setInventory(i) } catch {}
+  }, [])
 
-    useEffect(() => {
-        setToken(sessionStorage.getItem('adminToken'))
-        try {
-            const v = JSON.parse(localStorage.getItem('falak_vendors'))
-            if (v) setVendors(v)
-        } catch { }
-        try {
-            const i = JSON.parse(localStorage.getItem('falak_inventory'))
-            if (i) setInventory(i)
-        } catch { }
-    }, [])
+  const saveVendors   = (v) => { setVendors(v);   localStorage.setItem('falak_vendors',   JSON.stringify(v)) }
+  const saveInventory = (i) => { setInventory(i);  localStorage.setItem('falak_inventory', JSON.stringify(i)) }
 
-    const saveVendors = (v) => { setVendors(v); localStorage.setItem('falak_vendors', JSON.stringify(v)) }
-    const addVendor = () => {
-        if (!vendorForm.name.trim() || !vendorForm.role) return showToast('Name and role required.', 'error')
-        saveVendors([...vendors, { ...vendorForm, id: Date.now().toString(36) }])
-        setVendorForm({ name: '', role: '', phone: '', note: '' })
-        showToast('Vendor added!')
-    }
-    const deleteVendor = (id) => { saveVendors(vendors.filter(v => v.id !== id)); showToast('Vendor removed.') }
+  const addVendor = () => {
+    if (!vendorForm.name.trim() || !vendorForm.role) return showToast('Name and role required.', 'error')
+    saveVendors([...vendors, { ...vendorForm, id: Date.now().toString(36) }])
+    setVendorForm({ name: '', role: '', phone: '', note: '' })
+    showToast('Vendor added!')
+  }
 
-    const saveInventory = (inv) => { setInventory(inv); localStorage.setItem('falak_inventory', JSON.stringify(inv)) }
-    const updateInventoryItem = (id, field, value) => {
-        saveInventory(inventory.map(item => item.id === id ? { ...item, [field]: Number(value) || 0 } : item))
-    }
+  const deleteVendor = (id) => { saveVendors(vendors.filter(v => v.id !== id)); showToast('Vendor removed.') }
 
-    // ── auth guard ─────────────────────────────────────────────────────────
-    useEffect(() => {
-        // Prevent redirect flash on initial load
-        if (token === null) return
-        if (!token) router.push('/admin')
-    }, [token, router])
+  const updateInventoryItem = (id, field, value) => {
+    saveInventory(inventory.map(item => item.id === id ? { ...item, [field]: Number(value) || 0 } : item))
+  }
 
-    // ── api helpers ────────────────────────────────────────────────────────
-    const apiHeaders = { 'Content-Type': 'application/json', 'x-admin-token': token }
+  // Auth guard
+  useEffect(() => {
+    if (token === null) return
+    if (!token) router.push('/admin')
+  }, [token, router])
 
-    const showToast = (msg, type = 'success') => {
-        setToast({ msg, type })
-        setTimeout(() => setToast(null), 3500)
-    }
+  // API helpers
+  const apiHeaders = { 'Content-Type': 'application/json', 'x-admin-token': token }
 
-    const fetchBookings = useCallback(async () => {
-        if (!token) return
-        setLoading(true)
-        try {
-            const res = await fetch(`/api/admin/bookings?status=${filter}`, { headers: apiHeaders })
-            const data = await res.json()
-            if (data.success) setBookings(data.data)
-            else if (res.status === 401) { sessionStorage.clear(); router.push('/admin') }
-        } catch { showToast('Failed to load bookings.', 'error') }
-        finally { setLoading(false) }
-    }, [filter, token, router]) // Added token and router to deps
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type })
+    setTimeout(() => setToast(null), 3500)
+  }
 
-    const fetchAvailability = useCallback(async () => {
-        if (!token) return
-        try {
-            const res = await fetch('/api/admin/availability', { headers: apiHeaders })
-            const data = await res.json()
-            if (data.success) setAvailability(data.data)
-        } catch { }
-    }, [token]) // Added token to deps
+  const fetchBookings = useCallback(async () => {
+    if (!token) return
+    setLoading(true)
+    try {
+      const res  = await fetch(`${API_BASE}/api/admin/bookings?status=${filter}`, { headers: apiHeaders })
+      const data = await res.json()
+      if (data.success) setBookings(data.data)
+      else if (res.status === 401) { sessionStorage.clear(); router.push('/admin') }
+    } catch { showToast('Failed to load bookings.', 'error') }
+    finally { setLoading(false) }
+  }, [filter, token, router])
 
-    useEffect(() => { fetchBookings() }, [fetchBookings])
-    useEffect(() => { fetchAvailability() }, [fetchAvailability])
+  const fetchAvailability = useCallback(async () => {
+    if (!token) return
+    try {
+      const res  = await fetch(`${API_BASE}/api/admin/availability`, { headers: apiHeaders })
+      const data = await res.json()
+      if (data.success) setAvailability(data.data)
+    } catch {}
+  }, [token])
 
-    // ── booking actions ────────────────────────────────────────────────────
-    const updateStatus = async (id, status) => {
-        try {
-            const res = await fetch(`/api/admin/bookings/${id}`, {
-                method: 'PUT', headers: apiHeaders, body: JSON.stringify({ status }),
-            })
-            const data = await res.json()
-            if (data.success) { showToast(`Booking ${status}.`); fetchBookings(); fetchAvailability() }
-            else showToast(data.message, 'error')
-        } catch { showToast('Error updating booking.', 'error') }
-    }
+  useEffect(() => { fetchBookings() },     [fetchBookings])
+  useEffect(() => { fetchAvailability() }, [fetchAvailability])
 
-    const deleteBooking = async (id) => {
-        if (!window.confirm('Delete this booking? This cannot be undone.')) return
-        try {
-            const res = await fetch(`/api/admin/bookings/${id}`, { method: 'DELETE', headers: apiHeaders })
-            const data = await res.json()
-            if (data.success) { showToast('Booking deleted.'); fetchBookings(); fetchAvailability() }
-            else showToast(data.message, 'error')
-        } catch { showToast('Error deleting.', 'error') }
-    }
+  // Booking actions
+  const updateStatus = async (id, status) => {
+    try {
+      const res  = await fetch(`${API_BASE}/api/admin/bookings/${id}`, {
+        method: 'PUT', headers: apiHeaders, body: JSON.stringify({ status }),
+      })
+      const data = await res.json()
+      if (data.success) { showToast(`Booking ${status}.`); fetchBookings(); fetchAvailability() }
+      else showToast(data.message, 'error')
+    } catch { showToast('Error updating booking.', 'error') }
+  }
 
-    const openEdit = (booking) => {
-        setEditTarget(booking)
-        setForm({
-            name: booking.name || '',
-            phone: booking.phone || '',
-            email: booking.email || '',
-            eventDate: booking.eventDate || '',
-            eventType: booking.eventType || '',
-            hall: booking.hall || 'Any Available',
-            guests: booking.guests || '',
-            message: booking.message || '',
-            status: booking.status || 'pending',
-        })
-        setModal('edit')
-    }
+  const deleteBooking = async (id) => {
+    if (!window.confirm('Delete this booking? This cannot be undone.')) return
+    try {
+      const res  = await fetch(`${API_BASE}/api/admin/bookings/${id}`, { method: 'DELETE', headers: apiHeaders })
+      const data = await res.json()
+      if (data.success) { showToast('Booking deleted.'); fetchBookings(); fetchAvailability() }
+      else showToast(data.message, 'error')
+    } catch { showToast('Error deleting.', 'error') }
+  }
 
-    const openAdd = () => {
-        setForm(BLANK_FORM)
-        setEditTarget(null)
-        setModal('add')
-    }
+  const openEdit = (booking) => {
+    setEditTarget(booking)
+    setForm({
+      name: booking.name || '', phone: booking.phone || '', email: booking.email || '',
+      eventDate: booking.eventDate || '', eventType: booking.eventType || '',
+      hall: booking.hall || 'Any Available', guests: booking.guests || '',
+      message: booking.message || '', status: booking.status || 'pending',
+    })
+    setModal('edit')
+  }
 
-    const submitForm = async (e) => {
-        e.preventDefault()
-        setFormLoading(true)
-        try {
-            const isEdit = modal === 'edit'
-            const url = isEdit ? `/api/admin/bookings/${editTarget._id}` : '/api/admin/bookings'
-            const method = isEdit ? 'PUT' : 'POST'
-            const res = await fetch(url, { method, headers: apiHeaders, body: JSON.stringify(form) })
-            const data = await res.json()
-            if (data.success) {
-                showToast(isEdit ? 'Booking updated.' : 'Booking added.')
-                setModal(null)
-                fetchBookings()
-                fetchAvailability()
-            } else {
-                showToast(data.message, 'error')
-            }
-        } catch { showToast('Error saving booking.', 'error') }
-        finally { setFormLoading(false) }
-    }
+  const openAdd = () => { setForm(BLANK_FORM); setEditTarget(null); setModal('add') }
 
-    const setF = (k, v) => setForm(f => ({ ...f, [k]: v }))
+  const submitForm = async (e) => {
+    e.preventDefault()
+    setFormLoading(true)
+    try {
+      const isEdit = modal === 'edit'
+      const url    = isEdit ? `${API_BASE}/api/admin/bookings/${editTarget._id}` : `${API_BASE}/api/admin/bookings`
+      const res    = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: apiHeaders, body: JSON.stringify(form) })
+      const data   = await res.json()
+      if (data.success) {
+        showToast(isEdit ? 'Booking updated.' : 'Booking added.')
+        setModal(null); fetchBookings(); fetchAvailability()
+      } else showToast(data.message, 'error')
+    } catch { showToast('Error saving booking.', 'error') }
+    finally { setFormLoading(false) }
+  }
 
-    // ── availability actions ────────────────────────────────────────────────
-    const toggleDate = async (date, currentStatus) => {
-        const newStatus = currentStatus === 'booked' ? 'available' : 'booked'
-        try {
-            const res = await fetch('/api/admin/availability', {
-                method: 'POST', headers: apiHeaders, body: JSON.stringify({ date, status: newStatus }),
-            })
-            const data = await res.json()
-            if (data.success) { showToast(`Date ${newStatus}.`); fetchAvailability() }
-            else showToast(data.message, 'error')
-        } catch { showToast('Error updating date.', 'error') }
-    }
+  const setF = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
-    const blockManualDate = async () => {
-        if (!blockDate) return
-        try {
-            const res = await fetch('/api/admin/availability', {
-                method: 'POST', headers: apiHeaders, body: JSON.stringify({ date: blockDate, status: 'booked' }),
-            })
-            const data = await res.json()
-            if (data.success) { showToast('Date blocked.'); setBlockDate(''); fetchAvailability() }
-            else showToast(data.message, 'error')
-        } catch { showToast('Error.', 'error') }
-    }
+  // Availability actions
+  const toggleDate = async (date, currentStatus) => {
+    const newStatus = currentStatus === 'booked' ? 'available' : 'booked'
+    try {
+      const res  = await fetch(`${API_BASE}/api/admin/availability`, {
+        method: 'POST', headers: apiHeaders, body: JSON.stringify({ date, status: newStatus }),
+      })
+      const data = await res.json()
+      if (data.success) { showToast(`Date ${newStatus}.`); fetchAvailability() }
+      else showToast(data.message, 'error')
+    } catch { showToast('Error updating date.', 'error') }
+  }
 
-    // ── counts for header ──────────────────────────────────────────────────
-    const counts = bookings.reduce((acc, b) => {
-        acc[b.status] = (acc[b.status] || 0) + 1
-        return acc
-    }, {})
+  const blockManualDate = async () => {
+    if (!blockDate) return
+    try {
+      const res  = await fetch(`${API_BASE}/api/admin/availability`, {
+        method: 'POST', headers: apiHeaders, body: JSON.stringify({ date: blockDate, status: 'booked' }),
+      })
+      const data = await res.json()
+      if (data.success) { showToast('Date blocked.'); setBlockDate(''); fetchAvailability() }
+      else showToast(data.message, 'error')
+    } catch { showToast('Error.', 'error') }
+  }
 
-    const today = new Date().toISOString().split('T')[0]
+  const syncCalendar = async () => {
+    if (!window.confirm('Re-sync availability from all approved bookings?')) return
+    try {
+      const res  = await fetch(`${API_BASE}/api/admin/availability/sync`, { method: 'POST', headers: apiHeaders })
+      const data = await res.json()
+      if (data.success) { showToast('Availability synced!'); fetchAvailability() }
+      else showToast(data.message, 'error')
+    } catch { showToast('Sync failed.', 'error') }
+  }
 
-    if (token === null) return null // Hide while determining auth
+  const counts = bookings.reduce((acc, b) => { acc[b.status] = (acc[b.status] || 0) + 1; return acc }, {})
+  const today  = new Date().toISOString().split('T')[0]
 
-    // ── render ──────────────────────────────────────────────────────────────
-    return (
-        <div className="admin-wrap">
+  if (token === null) return null
 
-            {/* Toast */}
-            {toast ? (
-                <div className={`admin-toast admin-toast--${toast.type}`}>
-                    <i className={`fas fa-${toast.type === 'success' ? 'check-circle' : 'exclamation-circle'}`} />
-                    {toast.msg}
-                </div>
-            ) : null}
+  return (
+    <div className="admin-wrap">
 
-            {/* Sidebar */}
-            <aside className="admin-sidebar">
-                <div className="admin-sidebar-logo">FALAK HALL</div>
-                <div className="admin-sidebar-sub">Admin Dashboard</div>
-
-                <nav className="admin-nav">
-                    <button className={`admin-nav-item${tab === 'bookings' ? ' active' : ''}`} onClick={() => setTab('bookings')}>
-                        <i className="fas fa-calendar-check" /> Bookings
-                    </button>
-                    <button className={`admin-nav-item${tab === 'availability' ? ' active' : ''}`} onClick={() => setTab('availability')}>
-                        <i className="fas fa-calendar-alt" /> Availability
-                    </button>
-                    <button className={`admin-nav-item${tab === 'vendors' ? ' active' : ''}`} onClick={() => setTab('vendors')}>
-                        <i className="fas fa-users" /> Vendors
-                    </button>
-                    <button className={`admin-nav-item${tab === 'inventory' ? ' active' : ''}`} onClick={() => setTab('inventory')}>
-                        <i className="fas fa-boxes" /> Inventory
-                    </button>
-                </nav>
-
-                <div className="admin-sidebar-stats">
-                    <div className="admin-stat-mini"><span>{bookings.length}</span>Total</div>
-                    <div className="admin-stat-mini"><span className="text-gold">{counts.pending || 0}</span>Pending</div>
-                    <div className="admin-stat-mini"><span className="text-success">{counts.approved || 0}</span>Approved</div>
-                    <div className="admin-stat-mini"><span className="text-danger">{counts.rejected || 0}</span>Rejected</div>
-                </div>
-
-                <button className="admin-logout" onClick={() => { sessionStorage.clear(); router.push('/admin') }}>
-                    <i className="fas fa-sign-out-alt" /> Logout
-                </button>
-
-                <Link href="/" className="admin-btn-outline w-full mt-20 center-text">
-                    ← View Website
-                </Link>
-            </aside>
-
-            {/* Mobile Nav Switcher — only visible on small screens */}
-            <nav className="admin-mobile-nav">
-                <button className={`admin-mobile-nav-item${tab === 'bookings' ? ' active' : ''}`} onClick={() => setTab('bookings')}>
-                    <i className="fas fa-calendar-check" />
-                </button>
-                <button className={`admin-mobile-nav-item${tab === 'availability' ? ' active' : ''}`} onClick={() => setTab('availability')}>
-                    <i className="fas fa-calendar-alt" />
-                </button>
-                <button className={`admin-mobile-nav-item${tab === 'vendors' ? ' active' : ''}`} onClick={() => setTab('vendors')}>
-                    <i className="fas fa-users" />
-                </button>
-                <button className={`admin-mobile-nav-item${tab === 'inventory' ? ' active' : ''}`} onClick={() => setTab('inventory')}>
-                    <i className="fas fa-boxes" />
-                </button>
-                <button className="admin-mobile-nav-item danger" onClick={() => { sessionStorage.clear(); router.push('/admin') }}>
-                    <i className="fas fa-sign-out-alt" />
-                </button>
-            </nav>
-
-            {/* Main */}
-            <main className="admin-main">
-
-                {/* ── BOOKINGS TAB ── */}
-                {tab === 'bookings' ? (
-                    <>
-                        <div className="admin-header">
-                            <div>
-                                <h1 className="admin-page-title">Bookings</h1>
-                                <p className="admin-page-sub">Manage all booking requests and manual entries</p>
-                            </div>
-                            <button className="admin-btn-primary" onClick={openAdd}>
-                                <i className="fas fa-plus" /> Add Manual Booking
-                            </button>
-                        </div>
-
-                        {/* Filter tabs */}
-                        <div className="admin-filters">
-                            {['all', 'pending', 'approved', 'rejected'].map(f => (
-                                <button
-                                    key={f}
-                                    className={`admin-filter-btn${filter === f ? ' active' : ''}`}
-                                    onClick={() => setFilter(f)}
-                                >
-                                    {f.charAt(0).toUpperCase() + f.slice(1)}
-                                    {f === 'pending' && counts.pending > 0 ? (
-                                        <span className="admin-badge">{counts.pending}</span>
-                                    ) : null}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Table */}
-                        {loading ? (
-                            <div className="admin-loading"><i className="fas fa-circle-notch fa-spin" /> Loading…</div>
-                        ) : bookings.length === 0 ? (
-                            <div className="admin-empty">
-                                <i className="fas fa-inbox" />
-                                <p>No bookings found</p>
-                            </div>
-                        ) : (
-                            <div className="admin-table-wrap">
-                                <table className="admin-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Client</th>
-                                            <th>Event Date</th>
-                                            <th>Event Type</th>
-                                            <th>Guests</th>
-                                            <th>Status</th>
-                                            <th>Source</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {bookings.map(b => (
-                                            <tr key={b._id}>
-                                                <td>
-                                                    <div className="admin-client-name">{b.name}</div>
-                                                    <div className="admin-client-phone">{b.phone}</div>
-                                                    {b.email ? <div className="admin-client-phone">{b.email}</div> : null}
-                                                </td>
-                                                <td>
-                                                    <div className="weight-600">{b.eventDate}</div>
-                                                    <div className="text-muted-xs mt-2">
-                                                        {b.hall}
-                                                    </div>
-                                                </td>
-                                                <td>{b.eventType}</td>
-                                                <td>{b.guests > 0 ? b.guests : '—'}</td>
-                                                <td><StatusPill status={b.status} /></td>
-                                                <td><SourcePill source={b.source} /></td>
-                                                <td>
-                                                    <div className="admin-actions">
-                                                        {b.status === 'pending' ? (
-                                                            <>
-                                                                <button className="admin-action-btn approve" title="Approve" onClick={() => updateStatus(b._id, 'approved')}>
-                                                                    <i className="fas fa-check" />
-                                                                </button>
-                                                                <button className="admin-action-btn reject" title="Reject" onClick={() => updateStatus(b._id, 'rejected')}>
-                                                                    <i className="fas fa-times" />
-                                                                </button>
-                                                            </>
-                                                        ) : null}
-                                                        {b.status !== 'pending' ? (
-                                                            <button className="admin-action-btn reset" title="Set Pending" onClick={() => updateStatus(b._id, 'pending')}>
-                                                                <i className="fas fa-undo" />
-                                                            </button>
-                                                        ) : null}
-                                                        <button className="admin-action-btn edit" title="Edit" onClick={() => openEdit(b)}>
-                                                            <i className="fas fa-edit" />
-                                                        </button>
-                                                        <button className="admin-action-btn" title="Invoice" style={{ color: '#C6A769' }} onClick={() => generateInvoice(b)}>
-                                                            <i className="fas fa-file-invoice" />
-                                                        </button>
-                                                        <button className="admin-action-btn delete" title="Delete" onClick={() => deleteBooking(b._id)}>
-                                                            <i className="fas fa-trash" />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-
-                        {/* Message preview below table if booking selected */}
-                    </>
-                ) : null}
-
-                {/* ── AVAILABILITY TAB ── */}
-                {tab === 'availability' ? (
-                    <>
-                        <div className="admin-header">
-                            <div>
-                                <h1 className="admin-page-title">Availability</h1>
-                                <p className="admin-page-sub">Block or unblock dates manually</p>
-                            </div>
-                            <button 
-                                className="admin-btn-ghost" 
-                                onClick={async () => {
-                                    if (!window.confirm('Re-sync availability table from all approved bookings? This will fix calendar discrepancies.')) return;
-                                    try {
-                                        const res = await fetch('/api/admin/availability/sync', { method: 'POST', headers: apiHeaders });
-                                        const data = await res.json();
-                                        if (data.success) { showToast('Availability synced!'); fetchAvailability(); }
-                                        else showToast(data.message, 'error');
-                                    } catch { showToast('Sync failed.', 'error'); }
-                                }}
-                                style={{ fontSize: '0.75rem' }}
-                            >
-                                <i className="fas fa-sync-alt" /> Fix/Sync Calendar
-                            </button>
-                        </div>
-
-                        {/* Block date form */}
-                        <div className="admin-card mb-32">
-                            <h3 className="admin-card-title">Block a Date Manually</h3>
-                            <div className="admin-flex-row">
-                                <div className="admin-form-group mb-0 flex-1">
-                                    <label>Select Date</label>
-                                    <input type="date" className="admin-input" min={today} value={blockDate} onChange={e => setBlockDate(e.target.value)} />
-                                </div>
-                                <button className="admin-btn-primary" onClick={blockManualDate} disabled={!blockDate}>
-                                    <i className="fas fa-ban" /> Block Date
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Booked dates list */}
-                        <div className="admin-card">
-                            <h3 className="admin-card-title">All Blocked / Booked Dates</h3>
-                            {availability.length === 0 ? (
-                                <div className="admin-empty">
-                                    <i className="fas fa-calendar-check" />
-                                    <p>No dates blocked — all dates available</p>
-                                </div>
-                            ) : (
-                                <div className="admin-date-list">
-                                    {availability.sort((a, b) => a.date.localeCompare(b.date)).map(d => (
-                                        <div className="admin-date-item" key={d.date}>
-                                            <div>
-                                                <span className="admin-date-val">{d.date}</span>
-                                                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginLeft: 10 }}>
-                                                    {d.source === 'manual-block' ? 'Manually blocked' : 'Approved Booking'}
-                                                </span>
-                                            </div>
-                                            <button
-                                                className="admin-action-btn approve"
-                                                title="Unblock this date"
-                                                onClick={() => toggleDate(d.date, 'booked')}
-                                            >
-                                                <i className="fas fa-lock-open" /> Unblock
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </>
-                ) : null}
-
-                {/* ── VENDORS TAB ── */}
-                {tab === 'vendors' ? (
-                    <>
-                        <div className="admin-header">
-                            <div>
-                                <h1 className="admin-page-title">Vendor Management</h1>
-                                <p className="admin-page-sub">Manage catering staff, decorators, and event partners</p>
-                            </div>
-                        </div>
-
-                        <div className="admin-card" style={{ marginBottom: 32 }}>
-                            <h3 className="admin-card-title">Add Vendor / Staff</h3>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
-                                <div className="admin-form-group" style={{ marginBottom: 0 }}>
-                                    <label>Name *</label>
-                                    <input className="admin-input" placeholder="Vendor name" value={vendorForm.name} onChange={e => setVendorForm(f => ({ ...f, name: e.target.value }))} />
-                                </div>
-                                <div className="admin-form-group" style={{ marginBottom: 0 }}>
-                                    <label>Role *</label>
-                                    <select className="admin-input" value={vendorForm.role} onChange={e => setVendorForm(f => ({ ...f, role: e.target.value }))}>
-                                        <option value="">Select role…</option>
-                                        {VENDOR_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-                                    </select>
-                                </div>
-                                <div className="admin-form-group" style={{ marginBottom: 0 }}>
-                                    <label>Phone</label>
-                                    <input className="admin-input" placeholder="03xx-xxxxxxx" value={vendorForm.phone} onChange={e => setVendorForm(f => ({ ...f, phone: e.target.value }))} />
-                                </div>
-                                <div className="admin-form-group" style={{ marginBottom: 0 }}>
-                                    <label>Note</label>
-                                    <input className="admin-input" placeholder="Optional note" value={vendorForm.note} onChange={e => setVendorForm(f => ({ ...f, note: e.target.value }))} />
-                                </div>
-                            </div>
-                            <button className="admin-btn-primary" style={{ marginTop: 16 }} onClick={addVendor}>
-                                <i className="fas fa-plus" /> Add Vendor
-                            </button>
-                        </div>
-
-                        <div className="admin-card">
-                            <h3 className="admin-card-title">{vendors.length} Registered Vendors</h3>
-                            {vendors.length === 0 ? (
-                                <div className="admin-empty">
-                                    <i className="fas fa-users" />
-                                    <p>No vendors registered yet</p>
-                                </div>
-                            ) : (
-                                <div className="admin-table-wrap">
-                                    <table className="admin-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Role</th>
-                                                <th>Phone</th>
-                                                <th>Note</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {vendors.map(v => (
-                                                <tr key={v.id}>
-                                                    <td><strong>{v.name}</strong></td>
-                                                    <td><span style={{ background: 'rgba(198,167,105,0.15)', color: '#C6A769', padding: '2px 10px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 600 }}>{v.role}</span></td>
-                                                    <td>{v.phone || '—'}</td>
-                                                    <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{v.note || '—'}</td>
-                                                    <td>
-                                                        <button className="admin-action-btn delete" title="Remove" onClick={() => deleteVendor(v.id)}>
-                                                            <i className="fas fa-trash" />
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
-                    </>
-                ) : null}
-
-                {/* ── INVENTORY TAB ── */}
-                {tab === 'inventory' ? (
-                    <>
-                        <div className="admin-header">
-                            <div>
-                                <h1 className="admin-page-title">Inventory Tracker</h1>
-                                <p className="admin-page-sub">Track hall assets — chairs, lighting, sound equipment, and more</p>
-                            </div>
-                            <button className="admin-btn-ghost" onClick={() => { saveInventory(INVENTORY_DEFAULTS); showToast('Inventory reset to defaults.') }}>
-                                <i className="fas fa-undo" /> Reset Defaults
-                            </button>
-                        </div>
-
-                        <div className="admin-inventory-grid">
-                            {inventory.map(item => {
-                                const usagePercent = item.total > 0 ? Math.round(((item.inUse || 0) / item.total) * 100) : 0
-                                const barColor = usagePercent > 80 ? '#dc3545' : usagePercent > 50 ? '#ffc107' : '#28a745'
-                                return (
-                                    <div key={item.id} className="admin-inventory-card">
-                                        <div className="admin-inventory-header">
-                                            <div className="admin-inventory-icon">
-                                                <i className={item.icon} />
-                                            </div>
-                                            <div className="admin-inventory-info">
-                                                <h4>{item.name}</h4>
-                                                <p>{item.inUse || 0} / {item.total} in use</p>
-                                            </div>
-                                        </div>
-                                        <div className="admin-inventory-bar-wrap">
-                                            <div className="admin-inventory-bar" style={{ width: `${usagePercent}%`, background: barColor }} />
-                                        </div>
-                                        <div className="admin-inventory-controls">
-                                            <div className="admin-inventory-field">
-                                                <label>Total</label>
-                                                <input type="number" min="0" value={item.total} onChange={e => updateInventoryItem(item.id, 'total', e.target.value)} />
-                                            </div>
-                                            <div className="admin-inventory-field">
-                                                <label>In Use</label>
-                                                <input type="number" min="0" max={item.total} value={item.inUse || 0} onChange={e => updateInventoryItem(item.id, 'inUse', e.target.value)} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </>
-                ) : null}
-            </main>
-
-            {/* ── MODAL: Add / Edit Booking ── */}
-            {modal ? (
-                <div className="admin-modal-overlay" onClick={() => setModal(null)}>
-                    <div className="admin-modal" onClick={e => e.stopPropagation()}>
-                        <div className="admin-modal-header">
-                            <h2>{modal === 'add' ? 'Add Manual Booking' : 'Edit Booking'}</h2>
-                            <button className="admin-modal-close" onClick={() => setModal(null)}>
-                                <i className="fas fa-times" />
-                            </button>
-                        </div>
-
-                        <form onSubmit={submitForm} className="admin-modal-body">
-                            <div className="admin-form-row">
-                                <div className="admin-form-group">
-                                    <label>Full Name <span>*</span></label>
-                                    <input className="admin-input" type="text" placeholder="Client name" value={form.name} onChange={e => setF('name', e.target.value)} required />
-                                </div>
-                                <div className="admin-form-group">
-                                    <label>Phone <span>*</span></label>
-                                    <input className="admin-input" type="tel" placeholder="03xx-xxxxxxx" value={form.phone} onChange={e => setF('phone', e.target.value)} required />
-                                </div>
-                            </div>
-
-                            <div className="admin-form-row">
-                                <div className="admin-form-group">
-                                    <label>Email</label>
-                                    <input className="admin-input" type="email" placeholder="Optional" value={form.email} onChange={e => setF('email', e.target.value)} />
-                                </div>
-                                <div className="admin-form-group">
-                                    <label>Event Date <span>*</span></label>
-                                    <input className="admin-input" type="date" value={form.eventDate} onChange={e => setF('eventDate', e.target.value)} required />
-                                </div>
-                            </div>
-
-                            <div className="admin-form-row">
-                                <div className="admin-form-group">
-                                    <label>Event Type <span>*</span></label>
-                                    <select className="admin-input" value={form.eventType} onChange={e => setF('eventType', e.target.value)} required>
-                                        <option value="">Select type…</option>
-                                        {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                                    </select>
-                                </div>
-                                <div className="admin-form-group">
-                                    <label>Hall</label>
-                                    <select className="admin-input" value={form.hall} onChange={e => setF('hall', e.target.value)}>
-                                        {HALLS.map(h => <option key={h} value={h}>{h}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="admin-form-row">
-                                <div className="admin-form-group">
-                                    <label>Guests</label>
-                                    <input className="admin-input" type="number" min="1" placeholder="500" value={form.guests} onChange={e => setF('guests', e.target.value)} />
-                                </div>
-                                <div className="admin-form-group">
-                                    <label>Status</label>
-                                    <select className="admin-input" value={form.status} onChange={e => setF('status', e.target.value)}>
-                                        <option value="pending">Pending</option>
-                                        <option value="approved">Approved</option>
-                                        <option value="rejected">Rejected</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="admin-form-group">
-                                <label>Notes / Requirements</label>
-                                <textarea className="admin-input" rows={3} placeholder="Any special requirements…" value={form.message} onChange={e => setF('message', e.target.value)} style={{ resize: 'vertical' }} />
-                            </div>
-
-                            <div className="admin-modal-footer">
-                                <button type="button" className="admin-btn-ghost" onClick={() => setModal(null)}>Cancel</button>
-                                <button type="submit" className="admin-btn-primary" disabled={formLoading}>
-                                    {formLoading
-                                        ? <><i className="fas fa-circle-notch fa-spin" /> Saving…</>
-                                        : <><i className="fas fa-save" /> {modal === 'add' ? 'Add Booking' : 'Save Changes'}</>
-                                    }
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            ) : null}
+      {/* Toast */}
+      {toast ? (
+        <div className={`admin-toast admin-toast--${toast.type}`}>
+          <i className={`fas fa-${toast.type === 'success' ? 'check-circle' : 'exclamation-circle'}`} />
+          {toast.msg}
         </div>
-    )
+      ) : null}
+
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+        <div className="admin-sidebar-logo">FALAK HALL</div>
+        <div className="admin-sidebar-sub">Admin Dashboard</div>
+        <nav className="admin-nav">
+          {[
+            { key: 'bookings',     icon: 'fas fa-calendar-check', label: 'Bookings' },
+            { key: 'availability', icon: 'fas fa-calendar-alt',   label: 'Availability' },
+            { key: 'vendors',      icon: 'fas fa-users',           label: 'Vendors' },
+            { key: 'inventory',    icon: 'fas fa-boxes',           label: 'Inventory' },
+          ].map(({ key, icon, label }) => (
+            <button key={key} className={`admin-nav-item${tab === key ? ' active' : ''}`} onClick={() => setTab(key)}>
+              <i className={icon} /> {label}
+            </button>
+          ))}
+        </nav>
+        <div className="admin-sidebar-stats">
+          <div className="admin-stat-mini"><span>{bookings.length}</span>Total</div>
+          <div className="admin-stat-mini"><span className="text-gold">{counts.pending || 0}</span>Pending</div>
+          <div className="admin-stat-mini"><span className="text-success">{counts.approved || 0}</span>Approved</div>
+          <div className="admin-stat-mini"><span className="text-danger">{counts.rejected || 0}</span>Rejected</div>
+        </div>
+        <button className="admin-logout" onClick={() => { sessionStorage.clear(); router.push('/admin') }}>
+          <i className="fas fa-sign-out-alt" /> Logout
+        </button>
+        <Link href="/" className="admin-btn-outline w-full mt-20 center-text">← View Website</Link>
+      </aside>
+
+      {/* Mobile Nav */}
+      <nav className="admin-mobile-nav">
+        {[
+          { key: 'bookings',     icon: 'fas fa-calendar-check' },
+          { key: 'availability', icon: 'fas fa-calendar-alt' },
+          { key: 'vendors',      icon: 'fas fa-users' },
+          { key: 'inventory',    icon: 'fas fa-boxes' },
+        ].map(({ key, icon }) => (
+          <button key={key} className={`admin-mobile-nav-item${tab === key ? ' active' : ''}`} onClick={() => setTab(key)}>
+            <i className={icon} />
+          </button>
+        ))}
+        <button className="admin-mobile-nav-item danger" onClick={() => { sessionStorage.clear(); router.push('/admin') }}>
+          <i className="fas fa-sign-out-alt" />
+        </button>
+      </nav>
+
+      {/* Main */}
+      <main className="admin-main">
+
+        {/* ── BOOKINGS ── */}
+        {tab === 'bookings' && (
+          <>
+            <div className="admin-header">
+              <div>
+                <h1 className="admin-page-title">Bookings</h1>
+                <p className="admin-page-sub">Manage all booking requests and manual entries</p>
+              </div>
+              <button className="admin-btn-primary" onClick={openAdd}>
+                <i className="fas fa-plus" /> Add Manual Booking
+              </button>
+            </div>
+
+            <div className="admin-filters">
+              {['all', 'pending', 'approved', 'rejected'].map(f => (
+                <button key={f} className={`admin-filter-btn${filter === f ? ' active' : ''}`} onClick={() => setFilter(f)}>
+                  {f.charAt(0).toUpperCase() + f.slice(1)}
+                  {f === 'pending' && counts.pending > 0
+                    ? <span className="admin-badge">{counts.pending}</span>
+                    : null}
+                </button>
+              ))}
+            </div>
+
+            {loading ? (
+              <div className="admin-loading"><i className="fas fa-circle-notch fa-spin" /> Loading…</div>
+            ) : bookings.length === 0 ? (
+              <div className="admin-empty"><i className="fas fa-inbox" /><p>No bookings found</p></div>
+            ) : (
+              <div className="admin-table-wrap">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Client</th><th>Event Date</th><th>Event Type</th>
+                      <th>Guests</th><th>Status</th><th>Source</th><th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bookings.map(b => (
+                      <tr key={b._id}>
+                        <td>
+                          <div className="admin-client-name">{b.name}</div>
+                          <div className="admin-client-phone">{b.phone}</div>
+                          {b.email ? <div className="admin-client-phone">{b.email}</div> : null}
+                        </td>
+                        <td>
+                          <div className="weight-600">{b.eventDate}</div>
+                          <div className="text-muted-xs mt-2">{b.hall}</div>
+                        </td>
+                        <td>{b.eventType}</td>
+                        <td>{b.guests > 0 ? b.guests : '—'}</td>
+                        <td><StatusPill status={b.status} /></td>
+                        <td><SourcePill source={b.source} /></td>
+                        <td>
+                          <div className="admin-actions">
+                            {b.status === 'pending' && <>
+                              <button className="admin-action-btn approve" title="Approve" onClick={() => updateStatus(b._id, 'approved')}><i className="fas fa-check" /></button>
+                              <button className="admin-action-btn reject"  title="Reject"  onClick={() => updateStatus(b._id, 'rejected')}><i className="fas fa-times" /></button>
+                            </>}
+                            {b.status !== 'pending' &&
+                              <button className="admin-action-btn reset" title="Set Pending" onClick={() => updateStatus(b._id, 'pending')}><i className="fas fa-undo" /></button>
+                            }
+                            <button className="admin-action-btn edit"   title="Edit"    onClick={() => openEdit(b)}><i className="fas fa-edit" /></button>
+                            <button className="admin-action-btn"         title="Invoice" style={{ color: '#C6A769' }} onClick={() => generateInvoice(b)}><i className="fas fa-file-invoice" /></button>
+                            <button className="admin-action-btn delete"  title="Delete"  onClick={() => deleteBooking(b._id)}><i className="fas fa-trash" /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ── AVAILABILITY ── */}
+        {tab === 'availability' && (
+          <>
+            <div className="admin-header">
+              <div>
+                <h1 className="admin-page-title">Availability</h1>
+                <p className="admin-page-sub">Block or unblock dates manually</p>
+              </div>
+              <button className="admin-btn-ghost" onClick={syncCalendar} style={{ fontSize: '0.75rem' }}>
+                <i className="fas fa-sync-alt" /> Fix/Sync Calendar
+              </button>
+            </div>
+
+            <div className="admin-card mb-32">
+              <h3 className="admin-card-title">Block a Date Manually</h3>
+              <div className="admin-flex-row">
+                <div className="admin-form-group mb-0 flex-1">
+                  <label>Select Date</label>
+                  <input type="date" className="admin-input" min={today} value={blockDate} onChange={e => setBlockDate(e.target.value)} />
+                </div>
+                <button className="admin-btn-primary" onClick={blockManualDate} disabled={!blockDate}>
+                  <i className="fas fa-ban" /> Block Date
+                </button>
+              </div>
+            </div>
+
+            <div className="admin-card">
+              <h3 className="admin-card-title">All Blocked / Booked Dates</h3>
+              {availability.length === 0 ? (
+                <div className="admin-empty"><i className="fas fa-calendar-check" /><p>No dates blocked — all dates available</p></div>
+              ) : (
+                <div className="admin-date-list">
+                  {[...availability].sort((a, b) => a.date.localeCompare(b.date)).map(d => (
+                    <div className="admin-date-item" key={d.date}>
+                      <div>
+                        <span className="admin-date-val">{d.date}</span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginLeft: 10 }}>
+                          {d.source === 'manual-block' ? 'Manually blocked' : 'Approved Booking'}
+                        </span>
+                      </div>
+                      <button className="admin-action-btn approve" title="Unblock" onClick={() => toggleDate(d.date, 'booked')}>
+                        <i className="fas fa-lock-open" /> Unblock
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* ── VENDORS ── */}
+        {tab === 'vendors' && (
+          <>
+            <div className="admin-header">
+              <div>
+                <h1 className="admin-page-title">Vendor Management</h1>
+                <p className="admin-page-sub">Manage catering staff, decorators, and event partners</p>
+              </div>
+            </div>
+            <div className="admin-card" style={{ marginBottom: 32 }}>
+              <h3 className="admin-card-title">Add Vendor / Staff</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
+                {[
+                  { key: 'name',  label: 'Name *',  placeholder: 'Vendor name',   type: 'text' },
+                  { key: 'phone', label: 'Phone',    placeholder: '03xx-xxxxxxx', type: 'text' },
+                  { key: 'note',  label: 'Note',     placeholder: 'Optional note', type: 'text' },
+                ].map(({ key, label, placeholder, type }) => (
+                  <div key={key} className="admin-form-group" style={{ marginBottom: 0 }}>
+                    <label>{label}</label>
+                    <input className="admin-input" type={type} placeholder={placeholder}
+                      value={vendorForm[key]} onChange={e => setVendorForm(f => ({ ...f, [key]: e.target.value }))} />
+                  </div>
+                ))}
+                <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                  <label>Role *</label>
+                  <select className="admin-input" value={vendorForm.role}
+                    onChange={e => setVendorForm(f => ({ ...f, role: e.target.value }))}>
+                    <option value="">Select role…</option>
+                    {VENDOR_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                </div>
+              </div>
+              <button className="admin-btn-primary" style={{ marginTop: 16 }} onClick={addVendor}>
+                <i className="fas fa-plus" /> Add Vendor
+              </button>
+            </div>
+            <div className="admin-card">
+              <h3 className="admin-card-title">{vendors.length} Registered Vendors</h3>
+              {vendors.length === 0 ? (
+                <div className="admin-empty"><i className="fas fa-users" /><p>No vendors registered yet</p></div>
+              ) : (
+                <div className="admin-table-wrap">
+                  <table className="admin-table">
+                    <thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Note</th><th>Actions</th></tr></thead>
+                    <tbody>
+                      {vendors.map(v => (
+                        <tr key={v.id}>
+                          <td><strong>{v.name}</strong></td>
+                          <td><span style={{ background: 'rgba(198,167,105,0.15)', color: '#C6A769', padding: '2px 10px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 600 }}>{v.role}</span></td>
+                          <td>{v.phone || '—'}</td>
+                          <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{v.note || '—'}</td>
+                          <td>
+                            <button className="admin-action-btn delete" title="Remove" onClick={() => deleteVendor(v.id)}>
+                              <i className="fas fa-trash" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* ── INVENTORY ── */}
+        {tab === 'inventory' && (
+          <>
+            <div className="admin-header">
+              <div>
+                <h1 className="admin-page-title">Inventory Tracker</h1>
+                <p className="admin-page-sub">Track hall assets — chairs, lighting, sound equipment, and more</p>
+              </div>
+              <button className="admin-btn-ghost" onClick={() => { saveInventory(INVENTORY_DEFAULTS); showToast('Inventory reset to defaults.') }}>
+                <i className="fas fa-undo" /> Reset Defaults
+              </button>
+            </div>
+            <div className="admin-inventory-grid">
+              {inventory.map(item => {
+                const usagePercent = item.total > 0 ? Math.round(((item.inUse || 0) / item.total) * 100) : 0
+                const barColor = usagePercent > 80 ? '#dc3545' : usagePercent > 50 ? '#ffc107' : '#28a745'
+                return (
+                  <div key={item.id} className="admin-inventory-card">
+                    <div className="admin-inventory-header">
+                      <div className="admin-inventory-icon"><i className={item.icon} /></div>
+                      <div className="admin-inventory-info">
+                        <h4>{item.name}</h4>
+                        <p>{item.inUse || 0} / {item.total} in use</p>
+                      </div>
+                    </div>
+                    <div className="admin-inventory-bar-wrap">
+                      <div className="admin-inventory-bar" style={{ width: `${usagePercent}%`, background: barColor }} />
+                    </div>
+                    <div className="admin-inventory-controls">
+                      {['total', 'inUse'].map(field => (
+                        <div key={field} className="admin-inventory-field">
+                          <label>{field === 'total' ? 'Total' : 'In Use'}</label>
+                          <input type="number" min="0" max={field === 'inUse' ? item.total : undefined}
+                            value={item[field] || 0}
+                            onChange={e => updateInventoryItem(item.id, field, e.target.value)} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
+      </main>
+
+      {/* ── MODAL ── */}
+      {modal && (
+        <div className="admin-modal-overlay" onClick={() => setModal(null)}>
+          <div className="admin-modal" onClick={e => e.stopPropagation()}>
+            <div className="admin-modal-header">
+              <h2>{modal === 'add' ? 'Add Manual Booking' : 'Edit Booking'}</h2>
+              <button className="admin-modal-close" onClick={() => setModal(null)}><i className="fas fa-times" /></button>
+            </div>
+            <form onSubmit={submitForm} className="admin-modal-body">
+              <div className="admin-form-row">
+                <div className="admin-form-group">
+                  <label>Full Name <span>*</span></label>
+                  <input className="admin-input" type="text" placeholder="Client name" value={form.name} onChange={e => setF('name', e.target.value)} required />
+                </div>
+                <div className="admin-form-group">
+                  <label>Phone <span>*</span></label>
+                  <input className="admin-input" type="tel" placeholder="03xx-xxxxxxx" value={form.phone} onChange={e => setF('phone', e.target.value)} required />
+                </div>
+              </div>
+              <div className="admin-form-row">
+                <div className="admin-form-group">
+                  <label>Email</label>
+                  <input className="admin-input" type="email" placeholder="Optional" value={form.email} onChange={e => setF('email', e.target.value)} />
+                </div>
+                <div className="admin-form-group">
+                  <label>Event Date <span>*</span></label>
+                  <input className="admin-input" type="date" value={form.eventDate} onChange={e => setF('eventDate', e.target.value)} required />
+                </div>
+              </div>
+              <div className="admin-form-row">
+                <div className="admin-form-group">
+                  <label>Event Type <span>*</span></label>
+                  <select className="admin-input" value={form.eventType} onChange={e => setF('eventType', e.target.value)} required>
+                    <option value="">Select type…</option>
+                    {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div className="admin-form-group">
+                  <label>Hall</label>
+                  <select className="admin-input" value={form.hall} onChange={e => setF('hall', e.target.value)}>
+                    {HALLS.map(h => <option key={h} value={h}>{h}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="admin-form-row">
+                <div className="admin-form-group">
+                  <label>Guests</label>
+                  <input className="admin-input" type="number" min="1" placeholder="500" value={form.guests} onChange={e => setF('guests', e.target.value)} />
+                </div>
+                <div className="admin-form-group">
+                  <label>Status</label>
+                  <select className="admin-input" value={form.status} onChange={e => setF('status', e.target.value)}>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+              </div>
+              <div className="admin-form-group">
+                <label>Notes / Requirements</label>
+                <textarea className="admin-input" rows={3} placeholder="Any special requirements…"
+                  value={form.message} onChange={e => setF('message', e.target.value)} style={{ resize: 'vertical' }} />
+              </div>
+              <div className="admin-modal-footer">
+                <button type="button" className="admin-btn-ghost" onClick={() => setModal(null)}>Cancel</button>
+                <button type="submit" className="admin-btn-primary" disabled={formLoading}>
+                  {formLoading
+                    ? <><i className="fas fa-circle-notch fa-spin" /> Saving…</>
+                    : <><i className="fas fa-save" /> {modal === 'add' ? 'Add Booking' : 'Save Changes'}</>
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }

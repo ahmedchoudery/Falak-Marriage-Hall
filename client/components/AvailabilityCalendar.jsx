@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useReveal } from '../hooks/useReveal'
 import Link from 'next/link'
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || ''
+
 const DAYS   = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
@@ -27,7 +29,7 @@ export default function AvailabilityCalendar() {
   useEffect(() => {
     const fetchAvailability = async () => {
       try {
-        const res = await fetch('/api/availability')
+        const res = await fetch(`${API_BASE}/api/availability`)
         const data = await res.json()
         if (data.success) {
           setBookedDates(data.data.map(d => d.date))
@@ -56,26 +58,18 @@ export default function AvailabilityCalendar() {
 
   const cells = []
   for (let i = 0; i < firstDay; i++) cells.push({ empty: true })
-  
+
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
     const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear()
     const isPast  = new Date(year, month, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate())
-    cells.push({ 
-      day: d, 
-      booked: bookedDates.includes(dateStr), 
-      isToday, 
-      isPast 
-    })
+    cells.push({ day: d, booked: bookedDates.includes(dateStr), isToday, isPast })
   }
 
   return (
     <section id="availability" className="calendar-section">
       <div className="container">
-        <div
-          ref={headRef}
-          className={`section-title reveal${headVisible ? ' visible' : ''}`}
-        >
+        <div ref={headRef} className={`section-title reveal${headVisible ? ' visible' : ''}`}>
           <span className="section-label">Booking Status</span>
           <h2>Event Availability</h2>
           <div className="gold-divider" />
@@ -86,19 +80,11 @@ export default function AvailabilityCalendar() {
 
         <div className="calendar-card">
           <div className="calendar-header">
-            <button
-              onClick={prevMonth}
-              aria-label="Previous Month"
-              className="calendar-nav-btn"
-            >
+            <button onClick={prevMonth} aria-label="Previous Month" className="calendar-nav-btn">
               <i className="fas fa-chevron-left" />
             </button>
             <h3 className="calendar-title">{MONTHS[month]} {year}</h3>
-            <button
-              onClick={nextMonth}
-              aria-label="Next Month"
-              className="calendar-nav-btn"
-            >
+            <button onClick={nextMonth} aria-label="Next Month" className="calendar-nav-btn">
               <i className="fas fa-chevron-right" />
             </button>
           </div>
@@ -115,10 +101,7 @@ export default function AvailabilityCalendar() {
                 ? 'calendar-cell past'
                 : 'calendar-cell available'
               return (
-                <div
-                  key={c.day}
-                  className={`${cls} ${c.isToday ? 'today' : ''}`}
-                >
+                <div key={c.day} className={`${cls}${c.isToday ? ' today' : ''}`}>
                   <span className="cell-day-num">{c.day}</span>
                   {c.isToday && <span className="today-dot" />}
                 </div>
