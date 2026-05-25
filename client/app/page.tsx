@@ -4,7 +4,6 @@ import About from '@/components/About'
 import Services from '@/components/Services'
 import Gallery from '@/components/Gallery'
 import ParallaxBanner from '@/components/ParallaxBanner'
-import Packages from '@/components/Packages'
 import MenuBuilder from '@/components/MenuBuilder'
 import AvailabilityCalendar from '@/components/AvailabilityCalendar'
 import CTASection from '@/components/CTASection'
@@ -19,7 +18,6 @@ export default function Home() {
       <div id="services"><Services /></div>
       <div id="gallery"><Gallery /></div>
       <ParallaxBanner image="/images/gallery_3.png" />
-      <div id="packages"><Packages /></div>
       <div id="menu-builder"><MenuBuilder /></div>
       <div id="availability"><AvailabilityCalendar /></div>
       <CTASection />

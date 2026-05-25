@@ -12,7 +12,7 @@ export default function ParallaxBanner({ image = '/images/gallery_1.png', childr
             Celebrate
           </span>
           <h2>Your Dream Day Deserves the Finest Stage</h2>
-          <p style={{ margin: '16px 0 36px' }}>
+          <p style={{ margin: '16px auto 36px', maxWidth: '600px', textAlign: 'center' }}>
             Experience royal hospitality and breathtaking décor tailored to your vision.
           </p>
           <Link href="/booking" className="btn btn-gold">

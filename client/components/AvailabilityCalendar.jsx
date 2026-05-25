@@ -28,14 +28,19 @@ export default function AvailabilityCalendar() {
 
   useEffect(() => {
     const fetchAvailability = async () => {
+      if (!API_BASE) {
+        setLoading(false)
+        return
+      }
       try {
         const res = await fetch(`${API_BASE}/api/availability`)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const data = await res.json()
         if (data.success) {
           setBookedDates(data.data.map(d => d.date))
         }
       } catch (err) {
-        console.error('Failed to fetch availability:', err)
+        console.warn('Availability API unavailable:', err.message)
       } finally {
         setLoading(false)
       }

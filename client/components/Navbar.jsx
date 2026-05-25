@@ -9,7 +9,6 @@ const links = [
   { to: '/#about', label: 'About' },
   { to: '/#services', label: 'Services' },
   { to: '/#gallery', label: 'Gallery' },
-  { to: '/#packages', label: 'Packages' },
   { to: '/#menu-builder', label: 'Menu' },
   { to: '/#availability', label: 'Calendar' },
   { to: '/contact', label: 'Contact', page: true },
