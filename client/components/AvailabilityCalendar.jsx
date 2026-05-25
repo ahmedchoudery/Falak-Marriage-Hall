@@ -28,10 +28,6 @@ export default function AvailabilityCalendar() {
 
   useEffect(() => {
     const fetchAvailability = async () => {
-      if (!API_BASE) {
-        setLoading(false)
-        return
-      }
       try {
         const res = await fetch(`${API_BASE}/api/availability`)
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
