@@ -32,8 +32,8 @@ export default function AvailabilityCalendar() {
         const res = await fetch(`${API_BASE}/api/availability`)
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const data = await res.json()
-        if (data.success) {
-          setBookedDates(data.data.map(d => d.date))
+        if (data.success && Array.isArray(data.data)) {
+          setBookedDates(data.data.map(d => d ? d.date : '').filter(Boolean))
         }
       } catch (err) {
         console.warn('Availability API unavailable:', err.message)

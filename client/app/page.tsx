@@ -1,3 +1,6 @@
+'use client'
+
+import dynamic from 'next/dynamic'
 import ClientHero from '@/components/ClientHero'
 import Stats from '@/components/Stats'
 import About from '@/components/About'
@@ -5,9 +8,10 @@ import Services from '@/components/Services'
 import Gallery from '@/components/Gallery'
 import ParallaxBanner from '@/components/ParallaxBanner'
 import MenuBuilder from '@/components/MenuBuilder'
-import AvailabilityCalendar from '@/components/AvailabilityCalendar'
 import CTASection from '@/components/CTASection'
 import Location from '@/components/Location'
+
+const AvailabilityCalendar = dynamic(() => import('@/components/AvailabilityCalendar'), { ssr: false })
 
 export default function Home() {
   return (
