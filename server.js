@@ -207,6 +207,46 @@ app.get('/api/health', (req, res) => {
 
 // ── PUBLIC API (Rate Limited) ──────────────────────────
 
+app.get('/api/test-telegram', async (req, res) => {
+    try {
+        const url = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/getMe`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        const sendUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
+        const sendResponse = await fetch(sendUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: process.env.TELEGRAM_CHAT_ID,
+                text: 'Test message from Falak Hall API'
+            })
+        });
+        const sendData = await sendResponse.json();
+
+        // Get updates to find the correct chat ID
+        const updatesUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/getUpdates`;
+        const updatesResponse = await fetch(updatesUrl);
+        const updatesData = await updatesResponse.json();
+
+        const token = process.env.TELEGRAM_BOT_TOKEN || '';
+        const chatId = process.env.TELEGRAM_CHAT_ID || '';
+        
+        const tokenInfo = {
+            length: token.length,
+            startsWith: token.substring(0, 5),
+            middle: token.substring(11, 25),
+            endsWith: token.substring(token.length - 5),
+            hasQuotes: token.includes('"') || token.includes("'"),
+            hasSpaces: token.includes(' ')
+        };
+
+        res.json({ success: true, getMe: data, sendMessage: sendData, updates: updatesData, env: { tokenInfo, chatIdLength: chatId.length } });
+    } catch (err) {
+        res.json({ success: false, error: err.message, stack: err.stack });
+    }
+});
+
 app.post('/api/booking', bookingLimiter, async (req, res) => {
     try {
         const db = await connectDB();
@@ -405,11 +445,11 @@ app.put('/api/admin/bookings/:id', adminLimiter, adminAuth, async (req, res) => 
         // ── Availability Sync Logic ──
         const currentBooking = { ...oldBooking, ...updateData };
 
-        if (oldBooking.status === 'approved' && oldBooking.eventDate !== currentBooking.eventDate) {
+        if (['approved', 'pending'].includes(oldBooking.status) && oldBooking.eventDate !== currentBooking.eventDate) {
             await db.collection('availability').deleteOne({ date: oldBooking.eventDate });
         }
 
-        if (currentBooking.status === 'approved') {
+        if (['approved', 'pending'].includes(currentBooking.status)) {
             await db.collection('availability').updateOne(
                 { date: currentBooking.eventDate },
                 { $set: { date: currentBooking.eventDate, status: 'booked', bookingId: new ObjectId(id) } },

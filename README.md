@@ -1,221 +1,268 @@
-# Falak Hall & Events
+# Falak Hall & Events — Management & Booking System
 
-A production-grade web application and booking management system for Falak Marriage Hall & Events, a premium wedding and event venue located on GT Road, Gujrat, Pakistan. 
+The official website and booking management system for **Falak Marriage Hall & Events**, a premium wedding and event venue located on G.T. Road, Gujrat, Pakistan.
 
-The system is architected as a decoupled application with a modern Next.js 15 frontend and an Express.js API backend integrating MongoDB for persistence, Twilio for client SMS updates, and Resend for administrative email notifications.
-
----
-
-## Architectural Overview
-
-The application consists of two main components:
-1. **Frontend (`client/`)**: A Next.js 15 (React 19) App Router web app. It utilizes GSAP, Framer Motion, and Three.js for interactive experiences like the interactive Menu Price Builder and live Availability Calendar.
-2. **Backend (`server.js`)**: An Express.js REST API operating as a headless backend. It handles booking validation, updates MongoDB, caches database connections, and dispatches automated notifications.
-
-### Data Flow & Request Lifecycle
-
-```
-[Client App] ──(Book Event)──> [Express API] ──(Write)──> [MongoDB]
-     │                                │
-     │ (Approve Booking)              ├──(Email Alert)──> [Resend] (Admin)
-     v                                v
-[Admin HUD] ───────────────────> [Express API] ──(Send SMS)──> [Twilio] (Customer)
-```
-
-1. **Inquiry Phase**: A visitor submits a booking inquiry form on the website.
-2. **Ingestion**: The Next.js frontend sends a POST request to `/api/booking`. The Express API processes and inserts the booking into the `bookings` collection with a status of `pending`. A temporary block is simultaneously written to the `availability` collection for the requested date.
-3. **Admin Alert**: An email is dispatched instantly to the administrator via Resend to notify them of the new booking request.
-4. **Processing**: The administrator logs into the secure admin dashboard (`/admin`) using credential-less session validation verified via `x-admin-token`.
-5. **Confirmation**: When the admin approves the booking:
-   - The status updates to `approved` in MongoDB.
-   - The event date status is solidified in the `availability` collection.
-   - An automated SMS confirmation containing event details is dispatched directly to the customer's phone number using Twilio.
+This platform consists of a highly animated Next.js 15 client dashboard coupled with an Express.js REST API backend. It handles real-time calendar reservations, menu cost calculations, administrative reviews, and notification dispatches via Telegram and email.
 
 ---
 
-## Workspace Layout
+## Technical Features
+
+### 1. Interactive Menu Price Builder
+* **Dynamic Budget Calculator**: Users choose custom options across 5 categories: Starters, Mains, Rice & Bread, Desserts, and Beverages.
+* **Instant PKR Estimation**: Computes per-head rates and grand totals in real-time as users adjust the interactive guest slider (ranging from 50 to 1,500 guests).
+* **Included defaults**: Pre-populates traditional Pakistani menu elements (Chicken Qorma, Zeera Rice, Naan, Gulab Jamun, Tea) with a base rate of PKR 1,200/head.
+* **Sticky Mobile Summary**: Displays a responsive bottom bar summarizing the current estimate and offering a direct call-to-action button for booking.
+
+### 2. Live Availability Calendar
+* **Client Date Inquiries**: Renders a custom calendar grid showing dates that are booked, available, or past.
+* **Instant Status Updates**: Fetches confirmed bookings from the database to mark unavailable dates on the fly.
+* **Month Navigation**: Allows clients to scroll through upcoming months to find open dates for their events.
+
+### 3. Integrated Notification Dispatch
+* **Real-time Telegram Alerts**: Sends instant booking notifications directly to the administrator's Telegram account via a custom bot (`@FalakHall_bot`).
+* **Resend Email Integrations**: 
+  * Administrative notifications detailing client requirements (name, phone, guest counts, requested hall, custom message).
+  * Automated confirmation emails sent directly to the client acknowledging their submission.
+
+### 4. Admin Management HUD (Dashboard)
+* **JWT-based Security**: Protects administrative endpoints using JSON Web Tokens (8-hour expiry) rather than sharing permanent tokens in headers.
+* **Booking Approval Flow**: Admins review incoming requests, change dates, edit details, approve bookings, or reject them.
+* **Manual Date Controls**: Allows administrators to lock specific dates for maintenance, private events, or walk-in reservations, and sync the availability calendar.
+
+---
+
+## Directory Organization
 
 ```
-├── client/                     # Next.js 15 Application
-│   ├── app/                    # Next.js App Router structure (pages & routes)
-│   │   ├── admin/              # Administrative dashboard pages
-│   │   ├── blog/               # Event tips & venue blog pages
-│   │   ├── booking/            # Public online booking page
-│   │   ├── contact/            # Venue contact details and form
-│   │   ├── globals.css         # Foundational CSS styling
-│   │   ├── layout.tsx          # Root Next.js layout structure
-│   │   └── page.tsx            # Home page composition
-│   ├── components/             # Reusable UI modules (Three.js Hero, MenuBuilder, Stats, etc.)
-│   ├── context/                # React context providers (Admin Authentication)
-│   ├── hooks/                  # Custom hooks (e.g. scroll reveal triggers)
-│   ├── public/                 # Static assets (images, logos, icons)
-│   └── tsconfig.json           # TypeScript configuration
-├── server.js                   # Express.js entry point and REST API
-├── vercel.json                 # Vercel deployment overrides (serverless function router)
-├── package.json                # Root package configuration (backend scripts)
-└── .env                        # Local configuration (excluded from version control)
+├── client/                     # Next.js 15 Frontend
+│   ├── app/                    # Next.js App Router
+│   │   ├── admin/              # Admin login & dashboard interface
+│   │   ├── blog/               # Event planning guides and blog pages
+│   │   ├── booking/            # Public reservation inquiry form
+│   │   ├── contact/            # Venue address, directions, and inquiry form
+│   │   ├── globals.css         # Custom styling sheet (Ken Burns, gold gradients)
+│   │   └── page.tsx            # Main landing page composition
+│   ├── components/             # Reusable UI Components
+│   │   ├── About.jsx           # Venue story section
+│   │   ├── AvailabilityCalendar.jsx # Live calendar component
+│   │   ├── ClientHero.tsx      # Dynamic browser-only loader for Hero
+│   │   ├── Hero.jsx            # Entry banner with animations
+│   │   ├── Location.jsx        # Google Maps integration and contact cards
+│   │   ├── MenuBuilder.jsx     # Interactive price builder
+│   │   └── Navbar.jsx          # Responsive header navigation
+│   ├── context/                # Auth context (manages admin session tokens)
+│   ├── hooks/                  # Scroll trigger and reveal utilities
+│   └── tsconfig.json           # Frontend TypeScript parameters
+├── server.js                   # Node.js Express Backend & API
+├── vercel.json                 # Vercel routing configs (Express serverless routing)
+└── package.json                # Project script definitions
 ```
 
 ---
 
-## Database Schemas
+## Tech Stack
 
-The MongoDB database (`falak_hall_db`) utilizes two primary collections:
+* **Frontend**: Next.js 15.5 (React 19, TypeScript)
+* **Styling**: Custom CSS variables, responsive layout design, custom scroll reveals, gold color accents (`#C6A769`)
+* **Animations**: GSAP, Framer Motion, Anime.js, Swiper (sliders)
+* **Backend**: Node.js, Express.js (ES Modules syntax)
+* **Database**: MongoDB (Client Driver)
+* **Authentication**: JWT (`jsonwebtoken`)
+* **Security**: Helmet, Express Rate Limit (multi-tiered rate limiting), input sanitization
+* **Communications**: Resend API (Emails), Telegram Bot API (Instant Alerts)
+* **Hosting**: Vercel (Monorepo integration with frontend static exports served by serverless Express router)
 
-### 1. `bookings`
-Records detail-specific booking reservations and public inquiries.
-```javascript
-{
-  _id: ObjectId,
-  name: String,
-  phone: String,
-  email: String,
-  eventDate: String,    // Format: YYYY-MM-DD
-  eventType: String,    // e.g., 'Wedding', 'Mehndi', 'Walima'
-  hall: String,         // e.g., 'Executive', 'Premium'
-  guests: Number,
-  message: String,
-  status: String,       // 'pending' | 'approved' | 'rejected'
-  source: String,       // 'online' | 'manual'
-  createdAt: Date,
-  updatedAt: Date
-}
-```
+---
 
-### 2. `availability`
-Maintains high-performance query indexes for calendar event dates.
-```javascript
-{
-  _id: ObjectId,
-  date: String,         // Indexed unique string: YYYY-MM-DD
-  status: String,       // 'booked'
-  bookingId: ObjectId,  // Reference to associated document in bookings
-  source: String        // 'sync' | 'manual-block'
-}
-```
+## Security Configurations
+
+The Express backend implements several security layers to protect the system and resources:
+1. **MongoDB Operator Sanitization**: Intercepts request payloads and strips keys beginning with `$` to block query injection.
+2. **CORS Whitelisting**: Limits access to recognized production and local development origins.
+3. **Contextual Rate Limiting**:
+   * **Global Limit**: Max 100 requests/minute for general API routes.
+   * **Login Limit**: Strict lock out (max 5 attempts every 15 minutes) to mitigate brute-force entries.
+   * **Booking Limit**: Max 10 submissions per 15 minutes to prevent spam inquiries.
+   * **Availability Limit**: Max 30 calendar checks per minute.
+4. **Header Lockdowns**: Uses Helmet to structure security headers and restrict resource caching on administrative API calls.
 
 ---
 
 ## REST API Reference
 
-All backend API routes are prefixed with `/api`. Unmatched routes will resolve to `404 Not Found`.
+All routes are prefixed with `/api`. Unmatched endpoints return a `404 Resource not found` status.
 
-### Public Endpoints
+### Public Routes
 
-* **`POST /api/booking`**
-  Submits an event booking inquiry. 
-  *Payload:* `{ name, phone, email, eventDate, eventType, hall, guests, message }`
+#### `GET /api/health`
+Returns the status of the Express server.
+* **Response**: `200 OK`
+```json
+{
+  "success": true,
+  "service": "Falak Marriage Hall API",
+  "status": "operational"
+}
+```
 
-* **`GET /api/availability`**
-  Retrieves booked dates to populate the frontend calendar.
-  *Response:* `Array<{ date: string, status: string }>`
+#### `POST /api/booking`
+Submits a public booking inquiry.
+* **Payload**:
+```json
+{
+  "name": "Ahmed",
+  "phone": "03001234567",
+  "email": "ahmed@example.com",
+  "eventDate": "2026-10-15",
+  "eventType": "Barat",
+  "hall": "Executive",
+  "guests": 300,
+  "message": "Custom menu required."
+}
+```
+* **Response**: `201 Created`
+```json
+{
+  "success": true,
+  "message": "Booking received!",
+  "data": { "id": "60d5ec40..." }
+}
+```
 
-### Administrative Endpoints
-*All requests require the `x-admin-token` header matching the server's `ADMIN_TOKEN`.*
-
-* **`POST /api/admin/login`**
-  Validates credentials for the administration session.
-  *Payload:* `{ username, password }`
-  *Note:* The username is configured as `ahmedchoudery1`.
-
-* **`GET /api/admin/bookings`**
-  Returns all registered bookings sorted chronologically by creation date.
-
-* **`POST /api/admin/bookings/approve`**
-  Approves a booking and triggers confirmation SMS.
-  *Payload:* `{ id }`
-
-* **`POST /api/admin/bookings/reject`**
-  Rejects a booking, releasing the temporary calendar hold.
-  *Payload:* `{ id }`
-
-* **`POST /api/admin/bookings/delete`**
-  Deletes a booking record permanently.
-  *Payload:* `{ id }`
-
-* **`POST /api/admin/bookings/sync-dates`**
-  Synchronizes all approved bookings and manual date locks with the availability calendar.
+#### `GET /api/availability`
+Retrieves all booked dates.
+* **Response**: `200 OK`
+```json
+{
+  "success": true,
+  "data": [
+    { "_id": "60d5ec...", "date": "2026-10-15", "status": "booked", "bookingId": "..." }
+  ]
+}
+```
 
 ---
 
-## Environment Setup
+### Administrative Routes
+*All requests require the `x-admin-token` header containing a valid JWT.*
 
-Create a `.env` file in the root workspace directory:
+#### `POST /api/admin/login`
+Validates admin credentials and generates a signed session token.
+* **Payload**:
+```json
+{
+  "username": "ahmedchoudery1",
+  "password": "<ADMIN_TOKEN_VALUE>"
+}
+```
+* **Response**: `200 OK`
+```json
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsIn..."
+}
+```
+
+#### `GET /api/admin/bookings`
+Lists bookings. Can filter by status (`pending`, `approved`, `rejected`).
+* **Query Parameters**: `status` (optional)
+* **Response**: `200 OK`
+
+#### `POST /api/admin/bookings`
+Manually enters a booking from walk-in clients.
+* **Payload**: Similar to `/api/booking`, allows custom `status`.
+* **Response**: `201 Created`
+
+#### `PUT /api/admin/bookings/:id`
+Updates booking parameters (e.g. shifts dates, changes guest count, changes status).
+* **Response**: `200 OK`
+
+#### `DELETE /api/admin/bookings/:id`
+Permanently purges a record and frees the associated date in the calendar.
+* **Response**: `200 OK`
+
+#### `POST /api/admin/availability`
+Manually blocks or frees dates on the calendar.
+* **Payload**:
+```json
+{
+  "date": "2026-12-25",
+  "status": "booked" // 'available' to free the date
+}
+```
+* **Response**: `200 OK`
+
+#### `POST /api/admin/availability/sync`
+Synchronizes the availability table by scanning all approved bookings and manual date locks.
+* **Response**: `200 OK`
+
+---
+
+## Environment Variables
+
+Configure a `.env` file in the root directory:
 
 ```env
-# Server Configuration
+# Server
 PORT=3000
+
+# Security
+JWT_SECRET=your_jwt_signing_key_here
+CORS_ORIGIN=https://falak-marriage-hall.vercel.app,http://localhost:3000,http://localhost:3001
+
+# MongoDB Connection
 MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/falak_hall_db
 
 # Administrative Credentials
-ADMIN_TOKEN=your_secure_random_string_here
-ADMIN_EMAIL=recipient_admin_email@domain.com
+ADMIN_USERNAME=ahmedchoudery1
+ADMIN_TOKEN=your_secure_admin_password_here
+ADMIN_EMAIL=admin_notifications_recipient@domain.com
 
-# Email Dispatcher (Resend)
+# Email (Resend Integration)
 RESEND_API_KEY=re_1234567890abcdef
 
-# SMS Dispatcher (Twilio)
-TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-TWILIO_AUTH_TOKEN=your_twilio_auth_token_here
-TWILIO_PHONE_NUMBER=+1234567890
+# Admin Alerts (Telegram Integration)
+TELEGRAM_BOT_TOKEN=123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ
+TELEGRAM_CHAT_ID=987654321
 ```
 
 ---
 
-## Local Development
+## Local Development Setup
 
-### 1. Clone & Bootstrap
-Install dependencies across both the backend server and frontend client:
+### 1. Installation
+Install all backend and frontend dependencies in one step:
 ```bash
-git clone <repository-url>
-cd Falak-Marriage-Hall
 npm run install:all
 ```
 
-### 2. Execution
-Run the services concurrently in separate terminals:
+### 2. Configure Environment
+Create your local `.env` configuration file in the root folder, ensuring variables match your local database and credentials.
 
-**Terminal 1: Express REST API Backend**
-```bash
-npm run dev
-```
-*API runs at [http://localhost:3000](http://localhost:3000).*
+### 3. Launching
+Start the backend and frontend servers in separate terminal sessions:
 
-**Terminal 2: Next.js Frontend**
-```bash
-cd client
-npm run dev
-```
-*Frontend runs at [http://localhost:3001](http://localhost:3001).*
+* **Terminal 1 (Backend API)**:
+  ```bash
+  npm run dev
+  ```
+  Runs at [http://localhost:3000](http://localhost:3000).
 
----
-
-## Build and Deployment
-
-The project is structured for native deployment to **Vercel** as a monorepo setup:
-
-### Vercel Integration
-1. Connect the repository to Vercel.
-2. In your Vercel project settings, register all keys from your local `.env` file.
-3. Vercel automatically detects:
-   - The `client/` subdirectory as a Next.js application, compiling it using the `next build` framework profile.
-   - The root directory's `server.js` file as a serverless Node.js function routing through the overrides in root `/vercel.json`.
+* **Terminal 2 (Next.js Client)**:
+  ```bash
+  cd client
+  npm run dev
+  ```
+  Runs at [http://localhost:3001](http://localhost:3001).
 
 ---
 
-## Operational Troubleshooting
+## Vercel Deployment
 
-### 1. MongoDB Connection
-If the server reports database timeout errors:
-* Verify that the database connection string in `.env` matches your cluster details exactly.
-* Ensure your current development machine's public IP address is white-listed in MongoDB Atlas (Network Security tab).
-
-### 2. Verification of Twilio SMS
-If client notifications fail to send when a booking is approved:
-* Check application logs for message warnings. If variables are missing, the server outputs `[SMS] Twilio not configured. Skipping SMS`.
-* Verify that the destination number is registered in the "Verified Caller IDs" list if you are operating on a Twilio trial account.
-
-### 3. Build Compilation Failures
-If the frontend production build fails:
-* Clear compile caches by deleting `client/.next/` and `client/node_modules/`.
-* Run `cd client && npm install && npm run build` to execute a isolated, clean build run.
+The application is configured to run as a single Vercel deployment:
+1. Vercel builds the Next.js application inside `client/` and exports static assets to the `dist` directory.
+2. The root `server.js` functions as a serverless router based on the `vercel.json` rewrite overrides:
+   * Public asset directories and Next.js routes serve static HTML from `/dist`.
+   * `/api/*` endpoints are routed directly to the Express app.
+3. Configure all local `.env` variables under the Vercel project Settings tab prior to deployment.

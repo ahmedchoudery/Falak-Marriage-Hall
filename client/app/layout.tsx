@@ -18,6 +18,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://falak-marriage-hall.vercel.app"),
   title: "Falak Marriage Hall | Luxury Wedding Venue Gujrat",
   description:
     "Falak Marriage Hall – The most elegant and luxury wedding venue in Gujrat, Punjab. Premium catering, professional decoration, royal ambience. Book your dream event today.",
@@ -31,20 +32,34 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Falak Marriage Hall | Luxury Wedding Venue Gujrat",
     description:
-      "Host your dream wedding at Gujrat's most premium marriage hall. 1000+ guests, gourmet catering, royal decor.",
+      "Falak Marriage Hall – The most elegant and luxury wedding venue in Gujrat, Punjab. Premium catering, professional decoration, royal ambience. Book your dream event today.",
     url: "https://falak-marriage-hall.vercel.app/",
     siteName: "Falak Marriage Hall",
     images: [
       {
-        url: "https://falak-marriage-hall.vercel.app/images/hero_bg.png",
+        url: "/images/og_preview.png",
         width: 1200,
         height: 630,
+        alt: "Falak Marriage Hall - Luxury Wedding Venue in Gujrat",
       },
     ],
     locale: "en_US",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Falak Marriage Hall | Luxury Wedding Venue Gujrat",
+    description:
+      "Falak Marriage Hall – The most elegant and luxury wedding venue in Gujrat, Punjab. Premium catering, professional decoration, royal ambience. Book your dream event today.",
+    images: ["/images/og_preview.png"],
+  },
+  icons: {
+    icon: "/favicon_new.png",
+    shortcut: "/favicon_new.png",
+    apple: "/favicon_new.png",
+  },
 };
+
 
 export default function RootLayout({
   children,

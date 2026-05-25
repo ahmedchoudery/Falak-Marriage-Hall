@@ -90,7 +90,6 @@ export default function BookingPage() {
           `*Phone:* ${form.phone}\n` +
           (form.message ? `*Notes:* ${form.message}` : '')
         )
-        window.open(`https://wa.me/923086891083?text=${waMsg}`, '_blank')
 
         setTimeout(() => {
           anime({

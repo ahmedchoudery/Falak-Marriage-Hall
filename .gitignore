@@ -17,3 +17,5 @@ coverage/
 # Next.js build cache only — dist/ is committed so Vercel can serve it
 client/.next/
 /client/out/
+
+.vercel
