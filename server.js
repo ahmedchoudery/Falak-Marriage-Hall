@@ -2,7 +2,6 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Resend } from 'resend';
-import twilio from 'twilio';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -26,45 +25,29 @@ if (!JWT_SECRET) {
     process.exit(1);
 }
 
-// ── Twilio SMS Client ──
-const twilioClient = (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN)
-    ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-    : null;
-const TWILIO_FROM = process.env.TWILIO_PHONE_NUMBER || '';
+// ── Telegram Bot Client (Admin Notifications) ──
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-async function sendSMS(to, message) {
-    if (!twilioClient || !TWILIO_FROM) {
-        console.log('[SMS] Twilio not configured. Skipping SMS to', to);
+async function sendTelegramMessage(message) {
+    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+        console.log('[Telegram] Bot not configured. Skipping admin alert.');
         return;
     }
-    let phone = to.replace(/[\s-]/g, '');
-    if (phone.startsWith('03')) phone = '+92' + phone.slice(1);
-    if (!phone.startsWith('+')) phone = '+' + phone;
     try {
-        await twilioClient.messages.create({ body: message, from: TWILIO_FROM, to: phone });
-        console.log(`[SMS] Sent to ${phone}`);
-    } catch (err) {
-        console.error('[SMS] Failed:', err.message);
-    }
-}
-
-async function sendWhatsApp(to, message) {
-    if (!twilioClient || !TWILIO_FROM) {
-        console.log('[WhatsApp] Twilio not configured. Skipping WhatsApp to', to);
-        return;
-    }
-    let phone = to.replace(/[\s-]/g, '');
-    if (phone.startsWith('03')) phone = '+92' + phone.slice(1);
-    if (!phone.startsWith('+')) phone = '+' + phone;
-    try {
-        await twilioClient.messages.create({ 
-            body: message, 
-            from: `whatsapp:${TWILIO_FROM}`, 
-            to: `whatsapp:${phone}` 
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'Markdown'
+            })
         });
-        console.log(`[WhatsApp] Sent to ${phone}`);
+        console.log(`[Telegram] Alert sent to admin.`);
     } catch (err) {
-        console.error('[WhatsApp] Failed:', err.message);
+        console.error('[Telegram] Failed:', err.message);
     }
 }
 
@@ -311,15 +294,9 @@ app.post('/api/booking', bookingLimiter, async (req, res) => {
             } catch (err) { console.error('Email failed to send:', err); }
         }
 
-        // ── WhatsApp Notifications via Twilio ──
-        // 1. Notify Admin
-        const adminPhone = process.env.ADMIN_PHONE || '+923086891083'; // Default to Falak Hall official number
-        const adminWhatsAppMsg = `*New Booking Inquiry - Falak Hall* 🏛️\n\n*Name:* ${safeName}\n*Phone:* ${safePhone}\n*Date:* ${safeEventDate}\n*Event:* ${safeEventType}\n*Guests:* ${safeGuests}\n*Message:* ${safeMessage || 'None'}`;
-        await sendWhatsApp(adminPhone, adminWhatsAppMsg);
-
-        // 2. Notify Client
-        const clientWhatsAppMsg = `Hi ${safeName}! 👋\n\nThank you for choosing *Falak Marriage Hall*. We have received your booking inquiry for *${safeEventDate}*.\n\nOur team will contact you shortly to confirm the details. For urgent inquiries, please reply to this message.`;
-        await sendWhatsApp(safePhone, clientWhatsAppMsg);
+        // ── Telegram Notification (Admin Alert) ──
+        const adminTelegramMsg = `*New Booking Inquiry - Falak Hall* 🏛️\n\n*Name:* ${safeName}\n*Phone:* ${safePhone}\n*Date:* ${safeEventDate}\n*Event:* ${safeEventType}\n*Guests:* ${safeGuests}\n*Message:* ${safeMessage || 'None'}`;
+        await sendTelegramMessage(adminTelegramMsg);
 
         res.status(201).json({ success: true, message: 'Booking received!', data: { id: result.insertedId } });
     } catch (error) {
@@ -442,18 +419,8 @@ app.put('/api/admin/bookings/:id', adminLimiter, adminAuth, async (req, res) => 
             await db.collection('availability').deleteOne({ date: currentBooking.eventDate });
         }
 
-        // ── SMS Notification on status change ──
-        if (status && status !== oldBooking.status && currentBooking.phone) {
-            if (status === 'approved') {
-                sendSMS(currentBooking.phone,
-                    `Assalam-o-Alaikum ${currentBooking.name},\n\nYour booking at Falak Marriage Hall has been APPROVED!\n\nEvent: ${currentBooking.eventType}\nDate: ${currentBooking.eventDate}\nHall: ${currentBooking.hall || 'Any Available'}\n\nWe look forward to making your event unforgettable! Contact us at 0308-6891083 for any questions.\n\n— Falak Hall & Events`
-                );
-            } else if (status === 'rejected') {
-                sendSMS(currentBooking.phone,
-                    `Dear ${currentBooking.name},\n\nWe regret to inform you that your booking request for ${currentBooking.eventDate} at Falak Marriage Hall could not be accommodated.\n\nPlease contact us at 0308-6891083 to discuss alternative dates.\n\n— Falak Hall & Events`
-                );
-            }
-        }
+        // Note: SMS notifications to clients via Twilio have been removed to keep the platform free.
+        // If client status notifications are needed in the future, Resend email could be used here.
 
         res.json({ success: true, message: 'Booking updated.' });
     } catch (error) { console.error(error); res.status(500).json({ success: false, message: 'Server error.' }); }
