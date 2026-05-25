@@ -52,6 +52,7 @@ async function sendTelegramMessage(message) {
 }
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // ── SECURITY: Helmet HTTP Headers ──────────────────────
@@ -65,7 +66,7 @@ const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
     .split(',')
     .map(o => o.trim());
 
-app.use(cors({
+app.use('/api', cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (server-to-server, curl, mobile)
         if (!origin) return callback(null, true);
