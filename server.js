@@ -48,6 +48,26 @@ async function sendSMS(to, message) {
     }
 }
 
+async function sendWhatsApp(to, message) {
+    if (!twilioClient || !TWILIO_FROM) {
+        console.log('[WhatsApp] Twilio not configured. Skipping WhatsApp to', to);
+        return;
+    }
+    let phone = to.replace(/[\s-]/g, '');
+    if (phone.startsWith('03')) phone = '+92' + phone.slice(1);
+    if (!phone.startsWith('+')) phone = '+' + phone;
+    try {
+        await twilioClient.messages.create({ 
+            body: message, 
+            from: `whatsapp:${TWILIO_FROM}`, 
+            to: `whatsapp:${phone}` 
+        });
+        console.log(`[WhatsApp] Sent to ${phone}`);
+    } catch (err) {
+        console.error('[WhatsApp] Failed:', err.message);
+    }
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -248,6 +268,7 @@ app.post('/api/booking', bookingLimiter, async (req, res) => {
         // ── Admin Notification: Email via Resend ──
         if (resend) {
             try {
+                // 1. Send Email to Admin
                 await resend.emails.send({
                     from: 'Booking Alert <onboarding@resend.dev>',
                     to: [ADMIN_EMAIL],
@@ -268,8 +289,37 @@ app.post('/api/booking', bookingLimiter, async (req, res) => {
                         </div>
                     `,
                 });
+
+                // 2. Send Confirmation Email to Client (if email provided)
+                if (safeEmail) {
+                    await resend.emails.send({
+                        from: 'Falak Marriage Hall <onboarding@resend.dev>', // Update this when you have a verified domain!
+                        to: [safeEmail],
+                        subject: `Booking Request Received - Falak Marriage Hall`,
+                        html: `
+                            <div style="font-family: sans-serif; padding: 20px; border: 1px solid #C6A769; border-radius: 8px;">
+                                <h2 style="color: #C6A769; border-bottom: 2px solid #C6A769; padding-bottom: 10px;">Thank You, ${safeName}!</h2>
+                                <p>We have successfully received your booking inquiry for <strong>${safeEventDate}</strong>.</p>
+                                <p>Our team will review your request and contact you shortly at <strong>${safePhone}</strong> to confirm availability and discuss further details.</p>
+                                <br/>
+                                <p>Best Regards,</p>
+                                <p><strong>Falak Marriage Hall Team</strong></p>
+                            </div>
+                        `,
+                    });
+                }
             } catch (err) { console.error('Email failed to send:', err); }
         }
+
+        // ── WhatsApp Notifications via Twilio ──
+        // 1. Notify Admin
+        const adminPhone = process.env.ADMIN_PHONE || '+923086891083'; // Default to Falak Hall official number
+        const adminWhatsAppMsg = `*New Booking Inquiry - Falak Hall* 🏛️\n\n*Name:* ${safeName}\n*Phone:* ${safePhone}\n*Date:* ${safeEventDate}\n*Event:* ${safeEventType}\n*Guests:* ${safeGuests}\n*Message:* ${safeMessage || 'None'}`;
+        await sendWhatsApp(adminPhone, adminWhatsAppMsg);
+
+        // 2. Notify Client
+        const clientWhatsAppMsg = `Hi ${safeName}! 👋\n\nThank you for choosing *Falak Marriage Hall*. We have received your booking inquiry for *${safeEventDate}*.\n\nOur team will contact you shortly to confirm the details. For urgent inquiries, please reply to this message.`;
+        await sendWhatsApp(safePhone, clientWhatsAppMsg);
 
         res.status(201).json({ success: true, message: 'Booking received!', data: { id: result.insertedId } });
     } catch (error) {
