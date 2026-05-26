@@ -37,10 +37,11 @@ export const metadata: Metadata = {
     siteName: "Falak Marriage Hall",
     images: [
       {
-        url: "/images/og_preview.png",
+        url: "https://falak-marriage-hall.vercel.app/images/og_preview.jpg",
         width: 1200,
         height: 630,
         alt: "Falak Marriage Hall - Luxury Wedding Venue in Gujrat",
+        type: "image/jpeg",
       },
     ],
     locale: "en_US",
@@ -51,7 +52,7 @@ export const metadata: Metadata = {
     title: "Falak Marriage Hall | Luxury Wedding Venue Gujrat",
     description:
       "Falak Marriage Hall – The most elegant and luxury wedding venue in Gujrat, Punjab. Premium catering, professional decoration, royal ambience. Book your dream event today.",
-    images: ["/images/og_preview.png"],
+    images: ["https://falak-marriage-hall.vercel.app/images/og_preview.jpg"],
   },
   icons: {
     icon: "/favicon_new.png",
